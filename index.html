@@ -239,6 +239,7 @@
     .preview-wrap {
       overflow: auto;
       padding-bottom: 18px;
+      min-width: 0;
     }
 
     .print-root {
@@ -1021,6 +1022,10 @@
       text-transform: uppercase;
     }
 
+    .mobile-view-toggle {
+      display: none;
+    }
+
     @media (max-width: 1060px) {
       .workspace {
         grid-template-columns: 1fr;
@@ -1047,6 +1052,7 @@
       .editor-panel {
         padding: 12px;
         border-radius: 4px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.1);
       }
 
       .input-grid {
@@ -1054,19 +1060,48 @@
         gap: 6px;
       }
 
+      .control input,
+      .control select,
+      .control textarea {
+        min-height: 46px;
+        padding: 10px 11px;
+        font-size: 16px;
+      }
+
+      .control textarea {
+        min-height: 96px;
+      }
+
+      .medicine-card {
+        padding: 12px;
+      }
+
+      .medicine-card-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
       .actions {
         position: sticky;
         bottom: 0;
         padding-top: 8px;
         background: linear-gradient(180deg, rgba(248, 251, 251, 0), rgba(248, 251, 251, 0.96) 24%);
+        z-index: 5;
       }
 
       .btn {
         flex: 1 1 100%;
+        min-height: 46px;
+        padding: 10px 12px;
+      }
+
+      .btn.danger {
+        min-height: 40px;
+        padding: 8px 12px;
       }
 
       .preview-wrap {
-        padding-bottom: 8px;
+        padding: 0 0 88px;
       }
 
       .page-a5,
@@ -1087,6 +1122,52 @@
         height: auto;
         aspect-ratio: 210 / 297;
       }
+
+      .mobile-view-toggle {
+        position: fixed;
+        right: 10px;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+        z-index: 40;
+        display: inline-grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        padding: 4px;
+        border: 1px solid rgba(0, 95, 91, 0.18);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.18);
+        backdrop-filter: blur(10px);
+      }
+
+      .toggle-btn {
+        min-width: 98px;
+        min-height: 42px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--teal-900);
+        font-size: 9pt;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+      }
+
+      .toggle-btn.active {
+        background: var(--teal-800);
+        color: #fff;
+      }
+
+      body.mobile-view-editor .preview-wrap {
+        display: none;
+      }
+
+      body.mobile-view-preview .editor-panel {
+        display: none;
+      }
+
+      body.mobile-view-preview .preview-wrap {
+        display: block;
+      }
     }
 
     @media (max-width: 480px) {
@@ -1101,7 +1182,11 @@
       .control input,
       .control select,
       .control textarea {
-        padding: 8px 9px;
+        padding: 11px 12px;
+      }
+
+      .toggle-btn {
+        min-width: 88px;
       }
     }
 
@@ -1137,6 +1222,10 @@
         display: none !important;
       }
 
+      .mobile-view-toggle {
+        display: none !important;
+      }
+
       .workspace,
       .preview-wrap,
       .print-root {
@@ -1145,6 +1234,10 @@
         margin: 0;
         padding: 0;
         overflow: visible;
+      }
+
+      .preview-wrap {
+        display: block !important;
       }
 
       .page-a5,
@@ -1269,6 +1362,11 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
     </section>
   </main>
 
+  <div class="mobile-view-toggle" id="mobileViewToggle" aria-label="Cambiar vista móvil">
+    <button class="toggle-btn active" type="button" data-mobile-view="editor">Editor</button>
+    <button class="toggle-btn" type="button" data-mobile-view="preview">Preview</button>
+  </div>
+
   <script>
     const LIMITS = {
       a5: 4,
@@ -1278,14 +1376,23 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
 
     const form = document.getElementById("form");
     const printRoot = document.getElementById("printRoot");
+    const previewWrap = document.querySelector(".preview-wrap");
     const medicineList = document.getElementById("medicineList");
     const medicineSection = document.getElementById("medicineSection");
     const smartguideSection = document.getElementById("smartguideSection");
     const labSection = document.getElementById("labSection");
     const documentType = document.getElementById("documentType");
     const outputFormat = document.getElementById("outputFormat");
+    const mobileViewToggle = document.getElementById("mobileViewToggle");
+    const mobileViewButtons = [...document.querySelectorAll("[data-mobile-view]")];
+    const mobileMediaQuery = window.matchMedia("(max-width: 720px)");
     let labTwoUpAlertShown = false;
     let recipeTwoUpAlertShown = false;
+    let mobileView = "editor";
+    let renderDebounceTimer = 0;
+    let renderFrameId = 0;
+    let pendingRenderPriority = 0;
+    let lastRenderedHtml = "";
 
     const fields = {
       patient: document.getElementById("patient"),
@@ -1322,6 +1429,43 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       if (!value) return "";
       const parts = value.split("-");
       return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
+    }
+
+    function setBodyViewClass(format) {
+      document.body.className = `print-${format}${mobileMediaQuery.matches ? ` mobile-view-${mobileView}` : ""}`;
+    }
+
+    function setMobileView(nextView) {
+      mobileView = nextView === "preview" ? "preview" : "editor";
+      const format = outputFormat.value || "a5";
+      setBodyViewClass(format);
+      mobileViewButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.mobileView === mobileView);
+      });
+    }
+
+    function cancelScheduledRender() {
+      if (renderDebounceTimer) {
+        window.clearTimeout(renderDebounceTimer);
+        renderDebounceTimer = 0;
+      }
+      if (renderFrameId) {
+        window.cancelAnimationFrame(renderFrameId);
+        renderFrameId = 0;
+      }
+      pendingRenderPriority = 0;
+    }
+
+    function commitPreviewHtml(nextHtml) {
+      if (nextHtml === lastRenderedHtml) {
+        return;
+      }
+      const previousScrollTop = previewWrap.scrollTop;
+      const previousScrollLeft = previewWrap.scrollLeft;
+      printRoot.innerHTML = nextHtml;
+      lastRenderedHtml = nextHtml;
+      previewWrap.scrollTop = previousScrollTop;
+      previewWrap.scrollLeft = previousScrollLeft;
     }
 
     // Lee todos los datos actuales del formulario en una estructura simple.
@@ -1421,10 +1565,10 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       card.querySelector("[data-remove]").addEventListener("click", () => {
         card.remove();
         renumberMedicines();
-        renderBySelectedFormat();
+        scheduleRender(2);
       });
       renumberMedicines();
-      renderBySelectedFormat();
+      scheduleRender(2);
     }
 
     function renumberMedicines() {
@@ -1663,83 +1807,115 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       `;
     }
 
-    // Renderiza según formato seleccionado y aplica las reglas de paginación.
+    function buildPreviewHtml(data) {
+      const smartMode = data.type === "smartguide";
+      const labMode = data.type === "laboratorio";
+
+      medicineSection.hidden = smartMode || labMode;
+      smartguideSection.hidden = !smartMode;
+      labSection.hidden = !labMode;
+      setBodyViewClass(data.format);
+
+      if (!labMode || data.format !== "a4-two") {
+        labTwoUpAlertShown = false;
+      }
+      if (data.type !== "receta" || data.format !== "a4-two") {
+        recipeTwoUpAlertShown = false;
+      }
+
+      if (smartMode) {
+        const recipe = renderSmartGuide(data);
+        return data.format === "a4-two"
+          ? twoUpPageHtml(recipe)
+          : pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
+      }
+
+      if (labMode) {
+        if (data.format === "a4-two") {
+          if (data.labTests.length > 8 && !labTwoUpAlertShown) {
+            alert("El modo A4 con 2 solicitudes A5 solo admite 8 exámenes por copia. Use A5 individual o A4 individual para paginación automática.");
+            labTwoUpAlertShown = true;
+          } else if (data.labTests.length <= 8) {
+            labTwoUpAlertShown = false;
+          }
+          const recipe = renderLabRequest(data, data.labTests.slice(0, 8), 1, 1, 1, 8);
+          return twoUpPageHtml(recipe);
+        }
+
+        const perPage = data.format === "a4" ? 20 : 15;
+        const pages = chunkMedicines(data.labTests, perPage);
+        return pages.map((tests, index) => {
+          const firstNumber = index * perPage + 1;
+          const recipe = renderLabRequest(data, tests, index + 1, pages.length, firstNumber, perPage);
+          return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
+        }).join("");
+      }
+
+      if (data.format === "a4-two") {
+        if (data.medicines.length > LIMITS["a4-two"] && !recipeTwoUpAlertShown) {
+          alert("El modo A4 con 2 recetas A5 solo admite 4 medicamentos por receta. Use A5 individual o A4 individual para paginación automática.");
+          recipeTwoUpAlertShown = true;
+        } else if (data.medicines.length <= LIMITS["a4-two"]) {
+          recipeTwoUpAlertShown = false;
+        }
+        const meds = data.medicines.slice(0, LIMITS["a4-two"]);
+        const recipe = renderMedicalRecipe(data, meds, 1, 1, 1, LIMITS["a4-two"]);
+        return twoUpPageHtml(recipe);
+      }
+
+      const perPage = LIMITS[data.format];
+      const pages = chunkMedicines(data.medicines, perPage);
+      return pages.map((meds, index) => {
+        const firstNumber = index * perPage + 1;
+        const recipe = renderMedicalRecipe(data, meds, index + 1, pages.length, firstNumber, perPage);
+        return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
+      }).join("");
+    }
+
     function renderBySelectedFormat() {
       try {
         const data = readFormData();
-        const smartMode = data.type === "smartguide";
-        const labMode = data.type === "laboratorio";
-
-        medicineSection.hidden = smartMode || labMode;
-        smartguideSection.hidden = !smartMode;
-        labSection.hidden = !labMode;
-        document.body.className = `print-${data.format}`;
-        if (!labMode || data.format !== "a4-two") {
-          labTwoUpAlertShown = false;
-        }
-        if (data.type !== "receta" || data.format !== "a4-two") {
-          recipeTwoUpAlertShown = false;
-        }
-
-        if (smartMode) {
-          const recipe = renderSmartGuide(data);
-          printRoot.innerHTML = data.format === "a4-two"
-            ? twoUpPageHtml(recipe)
-            : pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
-          return;
-        }
-
-        if (labMode) {
-          if (data.format === "a4-two") {
-            if (data.labTests.length > 8 && !labTwoUpAlertShown) {
-              alert("El modo A4 con 2 solicitudes A5 solo admite 8 exámenes por copia. Use A5 individual o A4 individual para paginación automática.");
-              labTwoUpAlertShown = true;
-            } else if (data.labTests.length <= 8) {
-              labTwoUpAlertShown = false;
-            }
-            const recipe = renderLabRequest(data, data.labTests.slice(0, 8), 1, 1, 1, 8);
-            printRoot.innerHTML = twoUpPageHtml(recipe);
-            return;
-          }
-
-          const perPage = data.format === "a4" ? 20 : 15;
-          const pages = chunkMedicines(data.labTests, perPage);
-          printRoot.innerHTML = pages.map((tests, index) => {
-            const firstNumber = index * perPage + 1;
-            const recipe = renderLabRequest(data, tests, index + 1, pages.length, firstNumber, perPage);
-            return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
-          }).join("");
-          return;
-        }
-
-        if (data.format === "a4-two") {
-          if (data.medicines.length > LIMITS["a4-two"] && !recipeTwoUpAlertShown) {
-            alert("El modo A4 con 2 recetas A5 solo admite 4 medicamentos por receta. Use A5 individual o A4 individual para paginación automática.");
-            recipeTwoUpAlertShown = true;
-          } else if (data.medicines.length <= LIMITS["a4-two"]) {
-            recipeTwoUpAlertShown = false;
-          }
-          const meds = data.medicines.slice(0, LIMITS["a4-two"]);
-          const recipe = renderMedicalRecipe(data, meds, 1, 1, 1, LIMITS["a4-two"]);
-          printRoot.innerHTML = twoUpPageHtml(recipe);
-          return;
-        }
-
-        const perPage = LIMITS[data.format];
-        const pages = chunkMedicines(data.medicines, perPage);
-        printRoot.innerHTML = pages.map((meds, index) => {
-          const firstNumber = index * perPage + 1;
-          const recipe = renderMedicalRecipe(data, meds, index + 1, pages.length, firstNumber, perPage);
-          return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
-        }).join("");
+        commitPreviewHtml(buildPreviewHtml(data));
       } catch (error) {
-        printRoot.innerHTML = `<div class="page-a5"><section class="recipe"><div class="alert-box"><div class="alert-title">Error de vista previa</div><p>${escapeHtml(error.message)}</p></div></section></div>`;
+        commitPreviewHtml(`<div class="page-a5"><section class="recipe"><div class="alert-box"><div class="alert-title">Error de vista previa</div><p>${escapeHtml(error.message)}</p></div></section></div>`);
         console.error(error);
       }
     }
 
-    function printDocument() {
+    function flushRender() {
+      cancelScheduledRender();
       renderBySelectedFormat();
+    }
+
+    function scheduleRender(priority = 1) {
+      pendingRenderPriority = Math.max(pendingRenderPriority, priority);
+
+      if (pendingRenderPriority >= 2) {
+        cancelScheduledRender();
+        renderFrameId = window.requestAnimationFrame(() => {
+          renderFrameId = 0;
+          pendingRenderPriority = 0;
+          renderBySelectedFormat();
+        });
+        return;
+      }
+
+      if (renderDebounceTimer || renderFrameId) {
+        return;
+      }
+
+      renderDebounceTimer = window.setTimeout(() => {
+        renderDebounceTimer = 0;
+        renderFrameId = window.requestAnimationFrame(() => {
+          renderFrameId = 0;
+          pendingRenderPriority = 0;
+          renderBySelectedFormat();
+        });
+      }, 120);
+    }
+
+    function printDocument() {
+      flushRender();
       window.print();
     }
 
@@ -1748,19 +1924,41 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       fields.date.value = todayIso();
       medicineList.innerHTML = "";
       addMedicine();
-      renderBySelectedFormat();
+      flushRender();
     }
 
     document.getElementById("addMedicine").addEventListener("click", () => addMedicine());
     document.getElementById("clearBtn").addEventListener("click", clearForm);
     document.getElementById("printBtn").addEventListener("click", printDocument);
 
-    form.addEventListener("input", renderBySelectedFormat);
-    form.addEventListener("change", renderBySelectedFormat);
+    form.addEventListener("input", (event) => {
+      const target = event.target;
+      const immediate = target instanceof HTMLSelectElement || target.type === "checkbox" || target.type === "date";
+      scheduleRender(immediate ? 2 : 1);
+    });
+    form.addEventListener("change", () => scheduleRender(2));
+
+    mobileViewToggle.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-mobile-view]");
+      if (!button) return;
+      setMobileView(button.dataset.mobileView);
+    });
+
+    const handleViewportModeChange = () => {
+      setMobileView(mobileView);
+      flushRender();
+    };
+
+    if (typeof mobileMediaQuery.addEventListener === "function") {
+      mobileMediaQuery.addEventListener("change", handleViewportModeChange);
+    } else if (typeof mobileMediaQuery.addListener === "function") {
+      mobileMediaQuery.addListener(handleViewportModeChange);
+    }
 
     fields.date.value = todayIso();
+    setMobileView("editor");
     addMedicine();
-    renderBySelectedFormat();
+    flushRender();
   </script>
 </body>
 </html>
