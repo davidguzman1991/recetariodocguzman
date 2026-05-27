@@ -210,6 +210,133 @@
       margin-top: 12px;
     }
 
+    .draft-tools {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid var(--soft-line);
+      border-radius: 4px;
+      background: #fbfefe;
+    }
+
+    .draft-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .draft-status {
+      min-height: 18px;
+      color: #475569;
+      font-size: 8.6pt;
+      line-height: 1.3;
+    }
+
+    .draft-status.is-dirty {
+      color: #92400e;
+    }
+
+    .draft-status.is-saved {
+      color: #166534;
+    }
+
+    .draft-status.is-info {
+      color: var(--teal-800);
+    }
+
+    .draft-note {
+      color: #64748b;
+      font-size: 8.3pt;
+      line-height: 1.35;
+    }
+
+    .print-warnings {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid var(--soft-line);
+      border-radius: 4px;
+      background: #f8fbfb;
+      color: #334155;
+    }
+
+    .print-warnings strong {
+      font-size: 8.8pt;
+      text-transform: uppercase;
+      color: var(--teal-900);
+    }
+
+    .print-warnings.is-critical {
+      border-color: #f3c7c3;
+      background: #fff8f7;
+      color: #7a271a;
+    }
+
+    .print-warnings.is-critical strong {
+      color: var(--warning);
+    }
+
+    .print-warnings.is-warning {
+      border-color: #f7d9a7;
+      background: #fffaf0;
+      color: #92400e;
+    }
+
+    .print-warnings.is-warning strong {
+      color: #b45309;
+    }
+
+    .print-warnings.is-ready {
+      border-color: #b7d6d4;
+      background: #f6fbfb;
+      color: #166534;
+    }
+
+    .print-warnings.is-ready strong {
+      color: #166534;
+    }
+
+    .print-warnings ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .print-warnings li {
+      margin: 0;
+      font-size: 9pt;
+      line-height: 1.35;
+    }
+
+    .print-warnings-block {
+      display: grid;
+      gap: 4px;
+    }
+
+    .print-warnings-block + .print-warnings-block {
+      margin-top: 2px;
+    }
+
+    .print-warnings-label {
+      font-size: 8.1pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    .print-warnings.is-critical .print-warnings-label {
+      color: var(--warning);
+    }
+
+    .print-warnings.is-warning .print-warnings-label {
+      color: #b45309;
+    }
+
+    .print-warnings.is-ready .print-warnings-label {
+      color: #166534;
+    }
+
     .btn {
       border: 0;
       border-radius: 4px;
@@ -258,6 +385,8 @@
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
       break-after: page;
       page-break-after: always;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .page-a5:last-child,
@@ -352,6 +481,8 @@
       height: 100%;
       position: relative;
       padding-bottom: 24mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .page-a4 .page-content {
@@ -487,7 +618,16 @@
       grid-template-columns: 19mm 1fr;
       column-gap: 2mm;
       margin-top: 1.7mm;
-      align-items: end;
+      align-items: start;
+    }
+
+    .diagnosis-value {
+      min-height: 10px;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      line-height: 1.2;
+      word-break: break-word;
     }
 
     .section-title {
@@ -1100,6 +1240,10 @@
         padding: 8px 12px;
       }
 
+      .draft-actions .btn {
+        flex: 1 1 100%;
+      }
+
       .preview-wrap {
         padding: 0 0 88px;
       }
@@ -1196,6 +1340,7 @@
         margin: 0;
         padding: 0;
         background: #fff;
+        color-adjust: exact;
       }
 
       body.print-a5 {
@@ -1226,11 +1371,22 @@
         display: none !important;
       }
 
+      .print-warnings,
+      .draft-tools,
+      .actions,
+      button,
+      input,
+      select,
+      textarea {
+        display: none !important;
+      }
+
       .workspace,
       .preview-wrap,
       .print-root {
         display: block;
         width: var(--print-page-width);
+        max-width: none !important;
         margin: 0;
         padding: 0;
         overflow: visible;
@@ -1245,6 +1401,29 @@
       .page-a4-two {
         margin: 0;
         box-shadow: none;
+        overflow: hidden;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+
+      .recipe,
+      .page-content,
+      .header,
+      .patient-box,
+      .bottom-grid,
+      .smartguide-box,
+      .lab-request-box,
+      .lab-note,
+      .next-footer {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .cut-line,
+      .cut-label,
+      .next-footer {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
       }
 
       body.print-a5 .page-a4,
@@ -1350,6 +1529,32 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
           </div>
         </section>
 
+        <section class="print-warnings" id="printWarnings" hidden>
+          <strong id="printWarningsTitle">Revisión antes de imprimir</strong>
+          <div class="print-warnings-block" id="criticalBlock" hidden>
+            <div class="print-warnings-label">Errores críticos</div>
+            <ul id="criticalList"></ul>
+          </div>
+          <div class="print-warnings-block" id="warningBlock" hidden>
+            <div class="print-warnings-label">Advertencias</div>
+            <ul id="warningList"></ul>
+          </div>
+          <div class="print-warnings-block" id="recommendationBlock" hidden>
+            <div class="print-warnings-label">Recomendaciones</div>
+            <ul id="recommendationList"></ul>
+          </div>
+        </section>
+
+        <section class="draft-tools">
+          <div class="draft-actions">
+            <button class="btn secondary" type="button" id="saveNowBtn">Guardar ahora</button>
+            <button class="btn secondary" type="button" id="clearDraftBtn">Limpiar borrador</button>
+            <button class="btn secondary" type="button" id="newDocumentBtn">Nuevo documento</button>
+          </div>
+          <div class="draft-status" id="draftStatus">Sin cambios guardados.</div>
+          <div class="draft-note">Este borrador se guarda solo en este dispositivo. No se sincroniza ni se envía a servidores.</div>
+        </section>
+
         <div class="actions">
           <button class="btn" type="button" id="printBtn">Imprimir / Guardar PDF</button>
           <button class="btn secondary" type="button" id="clearBtn">Limpiar formulario</button>
@@ -1381,18 +1586,38 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
     const medicineSection = document.getElementById("medicineSection");
     const smartguideSection = document.getElementById("smartguideSection");
     const labSection = document.getElementById("labSection");
+    const printWarnings = document.getElementById("printWarnings");
+    const printWarningsTitle = document.getElementById("printWarningsTitle");
+    const criticalBlock = document.getElementById("criticalBlock");
+    const warningBlock = document.getElementById("warningBlock");
+    const recommendationBlock = document.getElementById("recommendationBlock");
+    const criticalList = document.getElementById("criticalList");
+    const warningList = document.getElementById("warningList");
+    const recommendationList = document.getElementById("recommendationList");
+    const draftStatus = document.getElementById("draftStatus");
+    const saveNowBtn = document.getElementById("saveNowBtn");
+    const clearDraftBtn = document.getElementById("clearDraftBtn");
+    const newDocumentBtn = document.getElementById("newDocumentBtn");
     const documentType = document.getElementById("documentType");
     const outputFormat = document.getElementById("outputFormat");
     const mobileViewToggle = document.getElementById("mobileViewToggle");
     const mobileViewButtons = [...document.querySelectorAll("[data-mobile-view]")];
     const mobileMediaQuery = window.matchMedia("(max-width: 720px)");
-    let labTwoUpAlertShown = false;
-    let recipeTwoUpAlertShown = false;
+    const dynamicPrintStyle = document.createElement("style");
+    const STORAGE_KEY = "recetarioVirtualDraft";
+    const STORAGE_VERSION = "1.0";
     let mobileView = "editor";
     let renderDebounceTimer = 0;
     let renderFrameId = 0;
     let pendingRenderPriority = 0;
+    let autosaveTimer = 0;
     let lastRenderedHtml = "";
+    let lastValidationState = { critical: [], warnings: [], recommendations: [] };
+    let isRestoringDraft = false;
+    let lastSavedSnapshot = "";
+
+    dynamicPrintStyle.id = "dynamicPrintPageSize";
+    document.head.appendChild(dynamicPrintStyle);
 
     const fields = {
       patient: document.getElementById("patient"),
@@ -1418,7 +1643,22 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       return escapeHtml(String(value || "").trim()) || "&nbsp;";
     }
 
+    function safeLocalStorage() {
+      try {
+        return window.localStorage;
+      } catch (error) {
+        return null;
+      }
+    }
+
     function todayIso() {
+      const today = new Date();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      return `${today.getFullYear()}-${month}-${day}`;
+    }
+
+    function todayForInput() {
       const today = new Date();
       const month = String(today.getMonth() + 1).padStart(2, "0");
       const day = String(today.getDate()).padStart(2, "0");
@@ -1431,7 +1671,122 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
     }
 
+    function normalizeInputDate(value) {
+      if (!value) return "";
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+      const parts = String(value).split("/");
+      return parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : value;
+    }
+
+    function syncDynamicPrintPageSize(format) {
+      const printSize = format === "a5" ? "148mm 210mm" : "210mm 297mm";
+      dynamicPrintStyle.textContent = `@media print { @page { size: ${printSize}; margin: 0; } }`;
+    }
+
+    function setDraftStatus(message, tone = "info") {
+      draftStatus.textContent = message;
+      draftStatus.classList.remove("is-dirty", "is-saved", "is-info");
+      draftStatus.classList.add(
+        tone === "dirty" ? "is-dirty" : tone === "saved" ? "is-saved" : "is-info"
+      );
+    }
+
+    function medicineSnapshot(data) {
+      return (data.medicines || []).map((medicine) => ({
+        name: medicine.name || "",
+        quantity: medicine.quantity || "",
+        dose: medicine.dose || "",
+        route: medicine.route || "",
+        frequency: medicine.frequency || "",
+        duration: medicine.duration || "",
+        indications: medicine.indications || ""
+      }));
+    }
+
+    function buildDraftPayload(data) {
+      return {
+        version: STORAGE_VERSION,
+        savedAt: new Date().toISOString(),
+        documentType: data.type,
+        format: data.format,
+        patient: {
+          name: data.patient || "",
+          idNumber: data.idNumber || "",
+          age: data.age || "",
+          date: normalizeInputDate(data.date),
+          diagnosis: data.diagnosis || "",
+          nextVisit: data.nextVisit || ""
+        },
+        medicines: medicineSnapshot(data),
+        lab: {
+          tests: [...(data.labTests || [])],
+          instructions: [...(data.labInstructions || [])]
+        },
+        smartGuide: {
+          checks: [...(data.smartChecks || [])]
+        }
+      };
+    }
+
+    function draftComparableSnapshot(payload) {
+      const clone = JSON.parse(JSON.stringify(payload));
+      delete clone.savedAt;
+      return JSON.stringify(clone);
+    }
+
+    function saveDraftToStorage(showFeedback = false) {
+      const storage = safeLocalStorage();
+      if (!storage) {
+        setDraftStatus("No fue posible usar el almacenamiento local en este navegador.", "info");
+        return false;
+      }
+
+      try {
+        const payload = buildDraftPayload(readFormData());
+        storage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        lastSavedSnapshot = draftComparableSnapshot(payload);
+        if (showFeedback) {
+          setDraftStatus("Guardado automáticamente en este dispositivo.", "saved");
+        } else {
+          setDraftStatus("Guardado automáticamente.", "saved");
+        }
+        return true;
+      } catch (error) {
+        setDraftStatus("No se pudo guardar el borrador local.", "info");
+        return false;
+      }
+    }
+
+    function clearAutosaveTimer() {
+      if (autosaveTimer) {
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = 0;
+      }
+    }
+
+    function scheduleAutosave() {
+      if (isRestoringDraft) return;
+      clearAutosaveTimer();
+      setDraftStatus("Cambios sin guardar.", "dirty");
+      autosaveTimer = window.setTimeout(() => {
+        autosaveTimer = 0;
+        saveDraftToStorage(false);
+      }, 450);
+    }
+
+    function deleteDraftStorage() {
+      const storage = safeLocalStorage();
+      if (!storage) return;
+      try {
+        storage.removeItem(STORAGE_KEY);
+        lastSavedSnapshot = "";
+      } catch (error) {
+        // No-op; la UI reporta el estado sin romper el flujo.
+      }
+    }
+
     function setBodyViewClass(format) {
+      syncDynamicPrintPageSize(format);
       document.body.className = `print-${format}${mobileMediaQuery.matches ? ` mobile-view-${mobileView}` : ""}`;
     }
 
@@ -1468,6 +1823,199 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       previewWrap.scrollLeft = previousScrollLeft;
     }
 
+    function listHtml(items) {
+      return items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+    }
+
+    function renderPrintWarnings(validationState) {
+      lastValidationState = validationState;
+      const { critical, warnings, recommendations } = validationState;
+      const hasContent = critical.length || warnings.length || recommendations.length;
+
+      printWarnings.hidden = !hasContent;
+      printWarnings.classList.remove("is-critical", "is-warning", "is-ready");
+
+      if (critical.length) {
+        printWarnings.classList.add("is-critical");
+        printWarningsTitle.textContent = "Corrija antes de imprimir";
+      } else if (warnings.length) {
+        printWarnings.classList.add("is-warning");
+        printWarningsTitle.textContent = "Revise antes de imprimir";
+      } else {
+        printWarnings.classList.add("is-ready");
+        printWarningsTitle.textContent = "Listo para imprimir";
+      }
+
+      criticalBlock.hidden = critical.length === 0;
+      warningBlock.hidden = warnings.length === 0;
+      recommendationBlock.hidden = recommendations.length === 0;
+      criticalList.innerHTML = listHtml(critical);
+      warningList.innerHTML = listHtml(warnings);
+      recommendationList.innerHTML = listHtml(recommendations);
+    }
+
+    function collectPrintWarnings(data) {
+      const critical = [];
+      const warnings = [];
+      const recommendations = [];
+      const format = data.format;
+      const isA5 = format === "a5";
+      const isTwoUp = format === "a4-two";
+      const diagnosisLimit = isTwoUp ? 70 : isA5 ? 90 : 140;
+      const patientLimit = isTwoUp ? 30 : isA5 ? 38 : 54;
+      const nextVisitLimit = isTwoUp ? 14 : isA5 ? 18 : 24;
+      const labLineLimit = isTwoUp ? 44 : isA5 ? 52 : 70;
+      const rxNameLimit = isTwoUp ? 26 : isA5 ? 34 : 44;
+      const rxFieldLimit = isTwoUp ? 16 : isA5 ? 22 : 28;
+      const rxIndicationsLimit = isTwoUp ? 28 : isA5 ? 38 : 56;
+      const patientName = String(data.patient || "").trim();
+      const hasDate = String(data.date || "").trim();
+      const diagnosis = String(data.diagnosis || "").trim();
+      const nextVisit = String(data.nextVisit || "").trim();
+      const medsWithName = data.medicines.filter((medicine) => String(medicine.name || "").trim());
+      const medsWithAnyData = data.medicines
+        .map((medicine, index) => ({ medicine, index }))
+        .filter(({ medicine }) => {
+          return [medicine.name, medicine.quantity, medicine.dose, medicine.route, medicine.frequency, medicine.duration, medicine.indications]
+            .some((value) => String(value || "").trim());
+        });
+
+      if (!patientName) {
+        critical.push("Falta el nombre del paciente.");
+      }
+
+      if (!hasDate) {
+        critical.push("Falta la fecha del documento.");
+      }
+
+      if (patientName.length > patientLimit) {
+        warnings.push("El nombre del paciente es largo para el formato seleccionado y puede verse comprimido al imprimir.");
+      }
+
+      if (diagnosis.length > diagnosisLimit) {
+        warnings.push("El diagnóstico es largo para este formato. Revise la vista previa antes de imprimir para evitar texto clínico comprimido.");
+      }
+
+      if (nextVisit.length > nextVisitLimit) {
+        warnings.push("La próxima cita es extensa y puede quedar ajustada en el pie de página.");
+      } else if (!nextVisit) {
+        recommendations.push("La próxima cita está vacía; puede imprimir, pero se recomienda completarla.");
+      }
+
+      if (data.type === "receta") {
+        if (!diagnosis) {
+          recommendations.push("El diagnóstico está vacío; puede imprimir, pero se recomienda completarlo.");
+        }
+
+        if (!medsWithName.length) {
+          critical.push("La receta no tiene medicamentos agregados.");
+        }
+
+        medsWithAnyData.forEach(({ medicine, index }) => {
+          const hasName = String(medicine.name || "").trim();
+          if (!hasName) {
+            critical.push(`El medicamento ${index + 1} no tiene nombre registrado.`);
+          }
+        });
+
+        data.medicines.forEach((medicine, index) => {
+          if (String(medicine.name || "").trim().length > rxNameLimit) {
+            warnings.push(`Medicamento ${index + 1}: el nombre es largo para ${format === "a4" ? "A4" : format === "a4-two" ? "A4 con 2 recetas A5" : "A5"}.`);
+          }
+
+          ["quantity", "dose", "route", "frequency", "duration"].forEach((fieldKey) => {
+            if (String(medicine[fieldKey] || "").trim().length > rxFieldLimit) {
+              warnings.push(`Medicamento ${index + 1}: uno de los campos cortos es demasiado extenso y puede verse truncado en impresión.`);
+            }
+          });
+
+          if (String(medicine.indications || "").trim().length > rxIndicationsLimit) {
+            warnings.push(`Medicamento ${index + 1}: las indicaciones son largas. Considere resumirlas o usar un formato más amplio.`);
+          }
+
+          if (String(medicine.name || "").trim()) {
+            if (!String(medicine.dose || "").trim()) {
+              warnings.push(`El medicamento ${index + 1} no tiene dosis registrada.`);
+            }
+            if (!String(medicine.frequency || "").trim()) {
+              warnings.push(`El medicamento ${index + 1} no tiene frecuencia registrada.`);
+            }
+            if (!String(medicine.duration || "").trim()) {
+              warnings.push(`El medicamento ${index + 1} no tiene duración registrada.`);
+            }
+          }
+        });
+
+        if (format === "a5" && data.medicines.length > 4) {
+          warnings.push("La receta A5 genera una nueva página después del cuarto medicamento. Verifique ambas páginas antes de imprimir.");
+        }
+
+        if (format === "a4" && data.medicines.length > 8) {
+          warnings.push("La receta A4 genera una nueva página después del octavo medicamento. Revise la paginación en la vista previa.");
+        }
+      }
+
+      if (data.type === "laboratorio") {
+        if (!data.labTests.length) {
+          critical.push("La solicitud de laboratorio no tiene exámenes solicitados.");
+        }
+
+        if (!diagnosis) {
+          recommendations.push("El diagnóstico está vacío; puede imprimir, pero se recomienda registrar el motivo clínico.");
+        }
+
+        data.labTests.forEach((test, index) => {
+          if (String(test || "").trim().length > labLineLimit) {
+            warnings.push(`Examen ${index + 1}: el texto es largo y puede verse comprimido en la línea de impresión.`);
+          }
+        });
+
+        if (format === "a4-two" && data.labTests.length > 8) {
+          warnings.push("A4 con 2 solicitudes A5 solo admite 8 exámenes por copia. Use A5 individual o A4 individual para no recortar información.");
+        }
+
+        if (format === "a5" && data.labTests.length > 15) {
+          warnings.push("La solicitud A5 crea una nueva página después del examen 15. Revise la numeración y el pie en todas las páginas.");
+        }
+
+        if (format === "a4" && data.labTests.length > 20) {
+          warnings.push("La solicitud A4 crea una nueva página después del examen 20. Verifique que el PDF incluya todas las páginas.");
+        }
+
+        if (data.labInstructions.some((note) => String(note || "").trim().length > 72)) {
+          warnings.push("Las indicaciones para el paciente son largas y pueden verse muy compactas en formatos pequeños.");
+        }
+
+        if (!data.labInstructions.length) {
+          recommendations.push("Las indicaciones para el paciente están vacías; puede imprimir, pero se recomienda dejar una instrucción breve.");
+        }
+      }
+
+      if (data.type === "smartguide") {
+        if (!diagnosis) {
+          recommendations.push("El diagnóstico o motivo clínico está vacío; se recomienda completarlo.");
+        }
+
+        if (!data.smartChecks.length) {
+          warnings.push("No hay indicaciones clínicas marcadas en SmartGuide.");
+        }
+
+        if (diagnosis.length > diagnosisLimit) {
+          warnings.push("La solicitud SmartGuide tiene un diagnóstico extenso. Revise que no quede demasiado apretado en el cuadro del paciente.");
+        }
+      }
+
+      if (!critical.length && !warnings.length && !recommendations.length) {
+        recommendations.push("Documento completo y listo para imprimir.");
+      }
+
+      return {
+        critical: [...new Set(critical)],
+        warnings: [...new Set(warnings)],
+        recommendations: [...new Set(recommendations)]
+      };
+    }
+
     // Lee todos los datos actuales del formulario en una estructura simple.
     function readFormData() {
       return {
@@ -1498,8 +2046,8 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       return input ? input.value : "";
     }
 
-    function getMedicines() {
-      return [...medicineList.querySelectorAll(".medicine-card")].map((card) => ({
+    function medicineCardData(card) {
+      return {
         name: medValue(card, "name"),
         quantity: medValue(card, "quantity"),
         dose: medValue(card, "dose"),
@@ -1507,7 +2055,11 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         frequency: medValue(card, "frequency"),
         duration: medValue(card, "duration"),
         indications: medValue(card, "indications")
-      }));
+      };
+    }
+
+    function getMedicines() {
+      return [...medicineList.querySelectorAll(".medicine-card")].map((card) => medicineCardData(card));
     }
 
     function addMedicine(data = {}) {
@@ -1566,9 +2118,20 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         card.remove();
         renumberMedicines();
         scheduleRender(2);
+        scheduleAutosave();
       });
       renumberMedicines();
       scheduleRender(2);
+      scheduleAutosave();
+    }
+
+    function resetMedicineList(medicines = []) {
+      medicineList.innerHTML = "";
+      if (medicines.length) {
+        medicines.forEach((medicine) => addMedicine(medicine));
+      } else {
+        addMedicine();
+      }
     }
 
     function renumberMedicines() {
@@ -1614,7 +2177,7 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
             <div class="label age-label">Edad:</div><div class="fill-line age-value">${line(data.age)}</div>
             <div class="label date-label">Fecha:</div><div class="fill-line date-value">${line(data.date)}</div>
           </div>
-          <div class="diagnosis-row"><div class="label">Diagnóstico:</div><div class="fill-line">${line(data.diagnosis)}</div></div>
+          <div class="diagnosis-row"><div class="label">Diagnóstico:</div><div class="fill-line diagnosis-value">${line(data.diagnosis)}</div></div>
         </section>
       `;
     }
@@ -1815,13 +2378,7 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       smartguideSection.hidden = !smartMode;
       labSection.hidden = !labMode;
       setBodyViewClass(data.format);
-
-      if (!labMode || data.format !== "a4-two") {
-        labTwoUpAlertShown = false;
-      }
-      if (data.type !== "receta" || data.format !== "a4-two") {
-        recipeTwoUpAlertShown = false;
-      }
+      renderPrintWarnings(collectPrintWarnings(data));
 
       if (smartMode) {
         const recipe = renderSmartGuide(data);
@@ -1832,12 +2389,6 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
 
       if (labMode) {
         if (data.format === "a4-two") {
-          if (data.labTests.length > 8 && !labTwoUpAlertShown) {
-            alert("El modo A4 con 2 solicitudes A5 solo admite 8 exámenes por copia. Use A5 individual o A4 individual para paginación automática.");
-            labTwoUpAlertShown = true;
-          } else if (data.labTests.length <= 8) {
-            labTwoUpAlertShown = false;
-          }
           const recipe = renderLabRequest(data, data.labTests.slice(0, 8), 1, 1, 1, 8);
           return twoUpPageHtml(recipe);
         }
@@ -1852,12 +2403,6 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       }
 
       if (data.format === "a4-two") {
-        if (data.medicines.length > LIMITS["a4-two"] && !recipeTwoUpAlertShown) {
-          alert("El modo A4 con 2 recetas A5 solo admite 4 medicamentos por receta. Use A5 individual o A4 individual para paginación automática.");
-          recipeTwoUpAlertShown = true;
-        } else if (data.medicines.length <= LIMITS["a4-two"]) {
-          recipeTwoUpAlertShown = false;
-        }
         const meds = data.medicines.slice(0, LIMITS["a4-two"]);
         const recipe = renderMedicalRecipe(data, meds, 1, 1, 1, LIMITS["a4-two"]);
         return twoUpPageHtml(recipe);
@@ -1880,6 +2425,68 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         commitPreviewHtml(`<div class="page-a5"><section class="recipe"><div class="alert-box"><div class="alert-title">Error de vista previa</div><p>${escapeHtml(error.message)}</p></div></section></div>`);
         console.error(error);
       }
+    }
+
+    function applyDraftPayload(payload) {
+      if (!payload || typeof payload !== "object") return false;
+      isRestoringDraft = true;
+      try {
+        documentType.value = payload.documentType || "receta";
+        outputFormat.value = payload.format || "a5";
+        fields.patient.value = payload.patient?.name || "";
+        fields.idNumber.value = payload.patient?.idNumber || "";
+        fields.age.value = payload.patient?.age || "";
+        fields.date.value = payload.patient?.date || todayForInput();
+        fields.diagnosis.value = payload.patient?.diagnosis || "";
+        fields.nextVisit.value = payload.patient?.nextVisit || "";
+        fields.labTests.value = (payload.lab?.tests || []).join("\n");
+        fields.labInstructions.value = (payload.lab?.instructions || []).join("\n");
+
+        document.querySelectorAll("[data-smart-check]").forEach((checkbox) => {
+          checkbox.checked = (payload.smartGuide?.checks || []).includes(checkbox.value);
+        });
+
+        resetMedicineList(Array.isArray(payload.medicines) ? payload.medicines : []);
+        setDraftStatus("Borrador restaurado.", "saved");
+        return true;
+      } finally {
+        isRestoringDraft = false;
+      }
+    }
+
+    function loadSavedDraft() {
+      const storage = safeLocalStorage();
+      if (!storage) return null;
+      try {
+        const raw = storage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const payload = JSON.parse(raw);
+        if (!payload || payload.version !== STORAGE_VERSION) return null;
+        return payload;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function restoreDraftIfAvailable() {
+      const payload = loadSavedDraft();
+      if (!payload) {
+        setDraftStatus("Sin cambios guardados.", "info");
+        return false;
+      }
+
+      const shouldRestore = window.confirm("Se encontró un borrador guardado de una consulta anterior. ¿Deseas restaurarlo?");
+      if (!shouldRestore) {
+        setDraftStatus("Borrador detectado. Puede restaurarlo recargando la página o eliminarlo manualmente.", "info");
+        return false;
+      }
+
+      const restored = applyDraftPayload(payload);
+      if (restored) {
+        lastSavedSnapshot = draftComparableSnapshot(payload);
+        flushRender();
+      }
+      return restored;
     }
 
     function flushRender() {
@@ -1916,27 +2523,79 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
 
     function printDocument() {
       flushRender();
+      if (lastValidationState.critical.length) {
+        window.alert(
+          `No se puede imprimir todavía.\n\nCorrija lo siguiente:\n- ${lastValidationState.critical.join("\n- ")}`
+        );
+        return;
+      }
+
+      if (lastValidationState.warnings.length) {
+        const proceed = window.confirm(
+          `Revise antes de imprimir:\n\n- ${lastValidationState.warnings.join("\n- ")}\n\n¿Desea continuar con la impresión o guardado en PDF?`
+        );
+        if (!proceed) return;
+      }
       window.print();
     }
 
     function clearForm() {
       form.reset();
-      fields.date.value = todayIso();
-      medicineList.innerHTML = "";
-      addMedicine();
+      fields.date.value = todayForInput();
+      resetMedicineList();
       flushRender();
+      scheduleAutosave();
+    }
+
+    function saveNow() {
+      clearAutosaveTimer();
+      saveDraftToStorage(true);
+    }
+
+    function clearDraftOnly() {
+      const storage = safeLocalStorage();
+      if (!storage || !storage.getItem(STORAGE_KEY)) {
+        setDraftStatus("No hay borrador guardado en este dispositivo.", "info");
+        return;
+      }
+
+      const shouldClear = window.confirm("Se eliminará el borrador guardado en este dispositivo. El formulario actual no se borrará. ¿Deseas continuar?");
+      if (!shouldClear) return;
+      clearAutosaveTimer();
+      deleteDraftStorage();
+      setDraftStatus("Borrador eliminado.", "info");
+    }
+
+    function newDocument() {
+      const shouldStartNew = window.confirm("Se limpiará el formulario actual y se eliminará el borrador local. ¿Deseas continuar?");
+      if (!shouldStartNew) return;
+      clearAutosaveTimer();
+      deleteDraftStorage();
+      form.reset();
+      fields.date.value = todayForInput();
+      resetMedicineList();
+      renderPrintWarnings({ critical: [], warnings: [], recommendations: ["Documento nuevo listo para completar."] });
+      flushRender();
+      setDraftStatus("Documento nuevo listo. El borrador anterior fue eliminado.", "info");
     }
 
     document.getElementById("addMedicine").addEventListener("click", () => addMedicine());
     document.getElementById("clearBtn").addEventListener("click", clearForm);
     document.getElementById("printBtn").addEventListener("click", printDocument);
+    saveNowBtn.addEventListener("click", saveNow);
+    clearDraftBtn.addEventListener("click", clearDraftOnly);
+    newDocumentBtn.addEventListener("click", newDocument);
 
     form.addEventListener("input", (event) => {
       const target = event.target;
       const immediate = target instanceof HTMLSelectElement || target.type === "checkbox" || target.type === "date";
       scheduleRender(immediate ? 2 : 1);
+      scheduleAutosave();
     });
-    form.addEventListener("change", () => scheduleRender(2));
+    form.addEventListener("change", () => {
+      scheduleRender(2);
+      scheduleAutosave();
+    });
 
     mobileViewToggle.addEventListener("click", (event) => {
       const button = event.target.closest("[data-mobile-view]");
@@ -1955,10 +2614,14 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       mobileMediaQuery.addListener(handleViewportModeChange);
     }
 
-    fields.date.value = todayIso();
+    fields.date.value = todayForInput();
     setMobileView("editor");
-    addMedicine();
-    flushRender();
+    isRestoringDraft = true;
+    resetMedicineList();
+    isRestoringDraft = false;
+    if (!restoreDraftIfAvailable()) {
+      flushRender();
+    }
   </script>
 </body>
 </html>
