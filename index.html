@@ -1267,6 +1267,41 @@
         aspect-ratio: 210 / 297;
       }
 
+      body.mobile-view-preview .preview-wrap {
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        padding: 0 0 96px;
+      }
+
+      body.mobile-view-preview .print-root {
+        width: max-content;
+        min-width: 100%;
+        justify-content: start;
+        padding: 0 10px;
+      }
+
+      body.mobile-view-preview .page-a5,
+      body.mobile-view-preview .page-a4,
+      body.mobile-view-preview .page-a4-two {
+        width: auto;
+        height: auto;
+        max-width: none;
+        aspect-ratio: auto;
+        transform: none;
+      }
+
+      body.mobile-view-preview .page-a5 {
+        width: 148mm;
+        height: 210mm;
+      }
+
+      body.mobile-view-preview .page-a4,
+      body.mobile-view-preview .page-a4-two {
+        width: 210mm;
+        height: 297mm;
+      }
+
       .mobile-view-toggle {
         position: fixed;
         right: 10px;
