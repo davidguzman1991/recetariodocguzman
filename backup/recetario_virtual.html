@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recetario Virtual - Dr. David Guzmán P.</title>
+  <style>
+    @page {
+      size: A5 portrait;
+      margin: 0;
+    }
+
+    @page a5Page {
+      size: A5 portrait;
+      margin: 0;
+    }
+
+    @page a4Page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    :root {
+      --teal-900: #004d49;
+      --teal-800: #005f5b;
+      --teal-700: #007a75;
+      --teal-050: #f6fbfb;
+      --ink: #1f2933;
+      --muted: #5f6f7a;
+      --line: #b7d6d4;
+      --soft-line: #d9eceb;
+      --warning: #b42318;
+      --cut: #9ca3af;
+      --panel-bg: #f8fbfb;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: #e5e7eb;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 7.6pt;
+      line-height: 1.15;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 390px minmax(420px, 1fr);
+      gap: 18px;
+      width: min(1320px, calc(100% - 24px));
+      margin: 12px auto;
+      align-items: start;
+    }
+
+    .editor-panel {
+      position: sticky;
+      top: 12px;
+      max-height: calc(100vh - 24px);
+      overflow: auto;
+      background: var(--panel-bg);
+      border: 1px solid var(--soft-line);
+      border-radius: 6px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+      padding: 14px;
+      font-size: 10pt;
+      line-height: 1.3;
+    }
+
+    .editor-panel h1 {
+      margin: 0 0 3px;
+      color: var(--teal-900);
+      font-size: 18pt;
+      line-height: 1;
+    }
+
+    .editor-panel p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 9pt;
+    }
+
+    .form-section {
+      border-top: 1px solid var(--soft-line);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    .form-section:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .form-section h2 {
+      margin: 0 0 9px;
+      color: var(--teal-900);
+      font-size: 11pt;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .control {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 9px;
+    }
+
+    .control label,
+    .smart-checks legend {
+      color: var(--teal-900);
+      font-size: 8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .control input,
+    .control select,
+    .control textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--ink);
+      padding: 7px 8px;
+      outline: none;
+    }
+
+    .control textarea {
+      min-height: 68px;
+      resize: vertical;
+    }
+
+    .control input:focus,
+    .control select:focus,
+    .control textarea:focus {
+      border-color: var(--teal-700);
+      box-shadow: 0 0 0 3px rgba(0, 122, 117, 0.12);
+    }
+
+    .medicine-card {
+      border: 1px solid var(--soft-line);
+      border-radius: 4px;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 9px;
+    }
+
+    .medicine-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--teal-900);
+      font-weight: 800;
+    }
+
+    .smart-checks {
+      display: grid;
+      gap: 7px;
+      border: 1px solid var(--soft-line);
+      border-radius: 4px;
+      margin: 0 0 9px;
+      padding: 9px;
+      background: #fff;
+    }
+
+    .smart-checks label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #334155;
+      font-size: 9pt;
+    }
+
+    .smart-checks input[type="checkbox"] {
+      width: auto;
+      accent-color: var(--teal-700);
+    }
+
+    #labSection textarea {
+      min-height: 118px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 4px;
+      background: var(--teal-800);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 8px 10px;
+    }
+
+    .btn.secondary {
+      background: #d9eceb;
+      color: var(--teal-900);
+    }
+
+    .btn.danger {
+      background: var(--warning);
+      color: #fff;
+      padding: 5px 8px;
+      font-size: 8pt;
+    }
+
+    .btn:hover {
+      filter: brightness(0.94);
+    }
+
+    .preview-wrap {
+      overflow: auto;
+      padding-bottom: 18px;
+    }
+
+    .print-root {
+      display: grid;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* Formatos de salida. */
+    .page-a5,
+    .page-a4,
+    .page-a4-two {
+      position: relative;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .page-a5:last-child,
+    .page-a4:last-child,
+    .page-a4-two:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .page-a5 {
+      width: 148mm;
+      height: 210mm;
+      page: a5Page;
+    }
+
+    .page-a4 {
+      width: 210mm;
+      height: 297mm;
+      page: a4Page;
+      padding: 12mm 14mm 16mm;
+    }
+
+    .page-a4-two {
+      width: 210mm;
+      height: 297mm;
+      page: a4Page;
+    }
+
+    .cut-line {
+      position: absolute;
+      left: 6mm;
+      right: 6mm;
+      top: 148.5mm;
+      border-top: 0.35mm dashed var(--cut);
+      z-index: 10;
+    }
+
+    .cut-label {
+      position: absolute;
+      top: 146.2mm;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      color: #6b7280;
+      font-size: 6pt;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 0 3mm;
+      z-index: 11;
+    }
+
+    .recipe {
+      position: absolute;
+      padding: 0;
+      overflow: hidden;
+      background: #fff;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .page-a5 > .recipe {
+      left: 6mm;
+      top: 7mm;
+      width: 136mm;
+      height: 196mm;
+    }
+
+    .page-a4 > .recipe {
+      position: relative;
+      left: auto;
+      top: auto;
+      width: 100%;
+      height: 100%;
+    }
+
+    .page-a4-two .recipe {
+      left: 8mm;
+      width: 194mm;
+      height: 136.5mm;
+    }
+
+    .page-a4-two .recipe.top {
+      top: 7mm;
+    }
+
+    .page-a4-two .recipe.bottom {
+      top: 153.5mm;
+    }
+
+    .page-content {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      padding-bottom: 24mm;
+    }
+
+    .page-a4 .page-content {
+      max-width: 180mm;
+      margin: 0 auto;
+    }
+
+    /* Diseño visual basado en RECETARIO2.html. */
+    .header {
+      display: grid;
+      grid-template-columns: 1fr 56mm;
+      gap: 5mm;
+      padding-bottom: 2.2mm;
+      margin-bottom: 2.8mm;
+      border-bottom: 1.5px solid var(--teal-800);
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: var(--teal-900);
+      font-size: 14pt;
+      line-height: 1;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .brand .subtitle {
+      margin-top: 1.1mm;
+      color: var(--teal-700);
+      font-size: 7pt;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .brand .microcopy {
+      margin-top: 1.1mm;
+      color: var(--muted);
+      font-size: 6.2pt;
+    }
+
+    .credentials {
+      text-align: right;
+      color: #334155;
+      font-size: 6.3pt;
+      line-height: 1.22;
+      align-self: center;
+    }
+
+    .credentials strong {
+      color: var(--teal-900);
+    }
+
+    .patient-box {
+      border: 1px solid var(--soft-line);
+      background: var(--teal-050);
+      border-radius: 4px;
+      padding: 2.2mm 2.6mm;
+      margin-bottom: 2.2mm;
+    }
+
+    .patient-grid {
+      display: grid;
+      grid-template-columns: 16mm 1fr 13mm 34mm;
+      column-gap: 2mm;
+      row-gap: 1.7mm;
+      align-items: end;
+    }
+
+    .patient-grid .patient-label {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .patient-grid .patient-value {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .patient-grid .id-label {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .patient-grid .id-value {
+      grid-column: 4;
+      grid-row: 1;
+    }
+
+    .patient-grid .age-label {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .patient-grid .age-value {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .patient-grid .date-label {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    .patient-grid .date-value {
+      grid-column: 4;
+      grid-row: 2;
+    }
+
+    .label {
+      color: var(--teal-900);
+      font-weight: 700;
+      white-space: nowrap;
+      font-size: 6.8pt;
+    }
+
+    .fill-line,
+    .mini-line,
+    .date-line,
+    .rx-line {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .fill-line {
+      min-height: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .diagnosis-row {
+      display: grid;
+      grid-template-columns: 19mm 1fr;
+      column-gap: 2mm;
+      margin-top: 1.7mm;
+      align-items: end;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 1.6mm;
+      color: var(--teal-900);
+      font-size: 8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      margin: 1.6mm 0;
+    }
+
+    .section-title::before {
+      content: "";
+      display: inline-block;
+      width: 2.6mm;
+      height: 6.5mm;
+      border-radius: 2mm;
+      background: var(--teal-700);
+    }
+
+    .page-count {
+      text-align: right;
+      margin: -1.8mm 0 1mm;
+      color: var(--muted);
+      font-size: 6.2pt;
+      font-weight: 700;
+    }
+
+    .rx-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2mm;
+      overflow: hidden;
+    }
+
+    .page-a5 .rx-list {
+      height: 106mm;
+    }
+
+    .page-a4-two .rx-list {
+      height: 64mm;
+    }
+
+    .page-a4 .rx-list {
+      height: 178mm;
+    }
+
+    .rx-item {
+      border: 1px solid #dde8e8;
+      border-radius: 4px;
+      overflow: hidden;
+      break-inside: avoid;
+      background: #fff;
+    }
+
+    .page-a5 .rx-item {
+      height: 25mm;
+    }
+
+    .page-a4-two .rx-item {
+      height: 14.5mm;
+    }
+
+    .page-a4 .rx-item {
+      height: 20.5mm;
+    }
+
+    .rx-horizontal {
+      display: grid;
+      grid-template-columns: 7mm 1fr;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .rx-number {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--teal-800);
+      color: #fff;
+      font-weight: 800;
+      font-size: 7.5pt;
+    }
+
+    .rx-content {
+      min-width: 0;
+      padding: 1.4mm 1.9mm 1.4mm;
+      display: grid;
+      align-content: start;
+      gap: 0.95mm;
+    }
+
+    .rx-main-line,
+    .rx-detail-line,
+    .rx-indications-line {
+      display: grid;
+      align-items: end;
+      min-width: 0;
+    }
+
+    .rx-main-line {
+      grid-template-columns: 17mm 1fr;
+      gap: 1.4mm;
+    }
+
+    .rx-detail-line {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2mm;
+    }
+
+    .rx-detail-line.secondary {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .rx-indications-line {
+      grid-template-columns: 19mm 1fr;
+      gap: 1mm;
+      align-items: start;
+    }
+
+    .rx-indications-line .rx-line {
+      height: 6.4mm;
+      white-space: normal;
+      line-height: 1.15;
+      font-weight: 700;
+      padding-top: 0.2mm;
+      display: block;
+    }
+
+    .rx-label {
+      font-weight: 700;
+      color: #26343d;
+      white-space: nowrap;
+      font-size: 6.2pt;
+    }
+
+    .rx-med-name {
+      color: var(--ink);
+      font-size: 7.8pt;
+      font-weight: 800;
+      min-width: 0;
+      letter-spacing: 0.1px;
+    }
+
+    .rx-line {
+      height: 4.1mm;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--ink);
+      border-bottom: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .rx-value {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1mm;
+      min-width: 0;
+      align-items: end;
+    }
+
+    .rx-fields {
+      padding: 1.4mm 1.6mm;
+      display: grid;
+      grid-template-columns: 0.85fr 0.95fr 0.85fr;
+      column-gap: 1.8mm;
+      row-gap: 1.05mm;
+      align-items: center;
+    }
+
+    .page-a4 .rx-fields {
+      row-gap: 1.5mm;
+    }
+
+    .page-a4-two .rx-content {
+      gap: 0.32mm;
+      padding: 0.65mm 1.25mm;
+    }
+
+    .page-a4-two .rx-detail-line {
+      gap: 1.2mm;
+    }
+
+    .page-a4-two .rx-line {
+      height: 2.75mm;
+      font-size: 5.55pt;
+    }
+
+    .page-a4-two .rx-indications-line .rx-line {
+      height: 3.4mm;
+      white-space: nowrap;
+      line-height: 1;
+      padding-top: 0;
+    }
+
+    .page-a4-two .rx-label {
+      font-size: 5.25pt;
+    }
+
+    .page-a4-two .rx-med-name {
+      font-size: 6.2pt;
+    }
+
+    .page-a4-two .bottom-grid {
+      gap: 1.5mm;
+      margin-top: 1.4mm;
+    }
+
+    .page-a4-two .note-box,
+    .page-a4-two .alert-box {
+      padding: 1.2mm 1.6mm;
+    }
+
+    .page-a4-two .note-box li,
+    .page-a4-two .alert-box li {
+      margin: 0.25mm 0;
+      font-size: 5.3pt;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1mm;
+      align-items: end;
+      min-width: 0;
+    }
+
+    .field span:first-child {
+      font-weight: 700;
+      color: #26343d;
+      white-space: nowrap;
+      font-size: 6.2pt;
+    }
+
+    .mini-line {
+      min-height: 9px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: #334155;
+      font-size: 6.1pt;
+    }
+
+    .indications-line {
+      grid-column: 1 / -1;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 2.5mm;
+      margin-top: 2.4mm;
+    }
+
+    .page-a4 .bottom-grid {
+      margin-top: 4mm;
+    }
+
+    .note-box,
+    .alert-box {
+      border-radius: 4px;
+      padding: 2mm 2.5mm;
+      break-inside: avoid;
+    }
+
+    .note-box {
+      border: 1px dashed var(--line);
+      background: #fbfefe;
+    }
+
+    .alert-box {
+      border: 1px solid #f1b6b2;
+      background: #fffafa;
+    }
+
+    .note-title,
+    .alert-title {
+      margin-bottom: 1mm;
+      font-size: 6.8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .note-title {
+      color: var(--teal-800);
+    }
+
+    .alert-title {
+      color: var(--warning);
+    }
+
+    .note-box ul,
+    .alert-box ul {
+      margin: 0;
+      padding-left: 3.6mm;
+    }
+
+    .note-box li,
+    .alert-box li {
+      margin: 0.45mm 0;
+      font-size: 6.1pt;
+      color: #475569;
+    }
+
+    .smartguide-box {
+      overflow: hidden;
+    }
+
+    .page-a5 .smartguide-box,
+    .page-a4-two .smartguide-box {
+      height: 96mm;
+    }
+
+    .page-a4 .smartguide-box {
+      height: 233mm;
+    }
+
+    .smartguide-box .note-box,
+    .smartguide-box .alert-box {
+      margin-bottom: 1.7mm;
+      padding: 1.8mm 2.3mm;
+    }
+
+    .smartguide-box p {
+      margin: 0;
+      color: #334155;
+      font-size: 6.4pt;
+      line-height: 1.22;
+    }
+
+    .smartguide-check-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.6mm 2.6mm;
+      margin-top: 1.2mm;
+      color: #334155;
+      font-size: 6.3pt;
+    }
+
+    .lab-request-box {
+      border: 1px solid var(--soft-line);
+      border-radius: 4px;
+      background: #fff;
+      overflow: hidden;
+      padding: 2mm 2.5mm;
+    }
+
+    .page-a5 .lab-request-box,
+    .page-a4-two .lab-request-box {
+      height: auto;
+      max-height: 68mm;
+    }
+
+    .page-a5 .lab-request-box {
+      max-height: 72mm;
+    }
+
+    .page-a4 .lab-request-box {
+      height: auto;
+      max-height: 132mm;
+    }
+
+    .lab-line {
+      display: grid;
+      grid-template-columns: 7mm 1fr;
+      align-items: end;
+      gap: 1.5mm;
+      height: 4.5mm;
+      color: #334155;
+      font-size: 6.4pt;
+    }
+
+    .page-a4 .lab-line {
+      height: 6.2mm;
+      font-size: 7pt;
+    }
+
+    .page-a5 .lab-line {
+      height: 3.75mm;
+      gap: 1.1mm;
+      font-size: 5.9pt;
+    }
+
+    .lab-number {
+      color: var(--teal-900);
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .lab-text {
+      min-height: 4mm;
+      border-bottom: 1px solid var(--line);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .page-a5 .lab-text {
+      min-height: 3.2mm;
+    }
+
+    .lab-note {
+      margin-top: 2.4mm;
+      max-height: 22mm;
+      overflow: hidden;
+    }
+
+    .page-a5 .lab-note {
+      margin-top: 1.2mm;
+      max-height: 15mm;
+    }
+
+    .lab-note ul {
+      margin: 0;
+      padding-left: 3.8mm;
+    }
+
+    .lab-note li {
+      margin: 0.45mm 0;
+      color: #475569;
+      font-size: 6.2pt;
+    }
+
+    .page-a5 .lab-note li {
+      margin: 0.15mm 0;
+      font-size: 5.5pt;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8mm;
+      white-space: nowrap;
+    }
+
+    .box {
+      width: 2.5mm;
+      height: 2.5mm;
+      border: 1px solid #6b7e85;
+      border-radius: 1px;
+      background: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--teal-900);
+      font-size: 6pt;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .next-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: 1fr 45mm 38mm;
+      gap: 3mm;
+      align-items: end;
+      padding-top: 2mm;
+      border-top: 1.3px solid var(--teal-800);
+    }
+
+    .footer-info {
+      color: #475569;
+      font-size: 6.2pt;
+      line-height: 1.25;
+    }
+
+    .footer-info strong {
+      color: var(--teal-900);
+    }
+
+    .next-visit strong {
+      display: block;
+      color: var(--teal-900);
+      text-transform: uppercase;
+      font-size: 6.7pt;
+      margin-bottom: 1mm;
+    }
+
+    .date-line {
+      min-height: 11px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .motto {
+      margin-top: 1mm;
+      color: var(--teal-800);
+      font-style: italic;
+      font-weight: 700;
+      font-size: 6.3pt;
+    }
+
+    .signature {
+      text-align: center;
+    }
+
+    .signature img {
+      max-width: 45mm;
+      max-height: 18mm;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .signature-line {
+      height: 13mm;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #f8fafc;
+    }
+
+    .signature-line.fallback {
+      display: none;
+    }
+
+    .signature small {
+      display: block;
+      margin-top: 1mm;
+      color: #64748b;
+      font-size: 5.4pt;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 1060px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .editor-panel {
+        position: static;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      html,
+      body {
+        background: #eef3f3;
+      }
+
+      .workspace {
+        width: calc(100% - 12px);
+        gap: 12px;
+        margin: 6px auto 14px;
+      }
+
+      .editor-panel {
+        padding: 12px;
+        border-radius: 4px;
+      }
+
+      .input-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .actions {
+        position: sticky;
+        bottom: 0;
+        padding-top: 8px;
+        background: linear-gradient(180deg, rgba(248, 251, 251, 0), rgba(248, 251, 251, 0.96) 24%);
+      }
+
+      .btn {
+        flex: 1 1 100%;
+      }
+
+      .preview-wrap {
+        padding-bottom: 8px;
+      }
+
+      .page-a5,
+      .page-a4,
+      .page-a4-two {
+        transform-origin: top center;
+      }
+
+      .page-a5 {
+        width: min(148mm, calc(100vw - 20px));
+        height: auto;
+        aspect-ratio: 148 / 210;
+      }
+
+      .page-a4,
+      .page-a4-two {
+        width: min(210mm, calc(100vw - 20px));
+        height: auto;
+        aspect-ratio: 210 / 297;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .editor-panel h1 {
+        font-size: 16pt;
+      }
+
+      .editor-panel p {
+        font-size: 8.5pt;
+      }
+
+      .control input,
+      .control select,
+      .control textarea {
+        padding: 8px 9px;
+      }
+    }
+
+    @media print {
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+
+      body.print-a5 {
+        width: 148mm;
+      }
+
+      body.print-a4,
+      body.print-a4-two {
+        width: 210mm;
+      }
+
+      body.print-a5 {
+        --print-page-width: 148mm;
+        --print-page-height: 210mm;
+      }
+
+      body.print-a4,
+      body.print-a4-two {
+        --print-page-width: 210mm;
+        --print-page-height: 297mm;
+      }
+
+      .editor-panel {
+        display: none !important;
+      }
+
+      .workspace,
+      .preview-wrap,
+      .print-root {
+        display: block;
+        width: var(--print-page-width);
+        margin: 0;
+        padding: 0;
+        overflow: visible;
+      }
+
+      .page-a5,
+      .page-a4,
+      .page-a4-two {
+        margin: 0;
+        box-shadow: none;
+      }
+
+      body.print-a5 .page-a4,
+      body.print-a5 .page-a4-two,
+      body.print-a4 .page-a5,
+      body.print-a4 .page-a4-two,
+      body.print-a4-two .page-a5,
+      body.print-a4-two .page-a4 {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="print-a5">
+  <main class="workspace">
+    <aside class="editor-panel">
+      <h1>Recetario virtual</h1>
+      <p>Complete los datos y seleccione el formato de salida antes de imprimir o guardar como PDF.</p>
+
+      <form id="form">
+        <section class="form-section">
+          <h2>Documento</h2>
+          <div class="control">
+            <label for="documentType">Tipo de documento</label>
+            <select id="documentType">
+              <option value="receta">Receta médica</option>
+              <option value="smartguide">Solicitud SmartGuide</option>
+              <option value="laboratorio">Solicitud de laboratorio</option>
+            </select>
+          </div>
+          <div class="control">
+            <label for="outputFormat">Formato de salida</label>
+            <select id="outputFormat">
+              <option value="a5">A5 individual</option>
+              <option value="a4">A4 individual</option>
+              <option value="a4-two">A4 con 2 recetas A5 y línea de corte</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>Datos del paciente</h2>
+          <div class="control">
+            <label for="patient">Paciente</label>
+            <input id="patient" type="text" autocomplete="off" />
+          </div>
+          <div class="input-grid">
+            <div class="control">
+              <label for="idNumber">Cédula</label>
+              <input id="idNumber" type="text" autocomplete="off" />
+            </div>
+            <div class="control">
+              <label for="age">Edad</label>
+              <input id="age" type="text" autocomplete="off" />
+            </div>
+          </div>
+          <div class="input-grid">
+            <div class="control">
+              <label for="date">Fecha</label>
+              <input id="date" type="date" />
+            </div>
+            <div class="control">
+              <label for="nextVisit">Próxima cita</label>
+              <input id="nextVisit" type="text" autocomplete="off" />
+            </div>
+          </div>
+          <div class="control">
+            <label for="diagnosis">Diagnóstico</label>
+            <textarea id="diagnosis"></textarea>
+          </div>
+        </section>
+
+        <section class="form-section" id="medicineSection">
+          <h2>Medicamentos</h2>
+          <div id="medicineList"></div>
+          <button class="btn secondary" type="button" id="addMedicine">Agregar medicamento</button>
+        </section>
+
+        <section class="form-section" id="smartguideSection" hidden>
+          <h2>SmartGuide</h2>
+          <fieldset class="smart-checks">
+            <legend>Indicaciones clínicas</legend>
+            <label><input type="checkbox" value="Diabetes mellitus" data-smart-check /> Diabetes mellitus</label>
+            <label><input type="checkbox" value="Ajuste terapéutico" data-smart-check /> Ajuste terapéutico</label>
+            <label><input type="checkbox" value="Riesgo de hipoglucemia" data-smart-check /> Riesgo de hipoglucemia</label>
+            <label><input type="checkbox" value="Variabilidad glucémica" data-smart-check /> Variabilidad glucémica</label>
+            <label><input type="checkbox" value="Control metabólico" data-smart-check /> Control metabólico</label>
+            <label><input type="checkbox" value="Otro" data-smart-check /> Otro</label>
+          </fieldset>
+        </section>
+
+        <section class="form-section" id="labSection" hidden>
+          <h2>Laboratorio</h2>
+          <div class="control">
+            <label for="labTests">Exámenes solicitados</label>
+            <textarea id="labTests" placeholder="Escriba aquí los exámenes de laboratorio solicitados, uno por línea."></textarea>
+          </div>
+          <div class="control">
+            <label for="labInstructions">Indicaciones para el paciente</label>
+            <textarea id="labInstructions">Acudir en ayunas si el médico lo indicó.
+Llevar resultados previos si dispone de ellos.
+Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</textarea>
+          </div>
+        </section>
+
+        <div class="actions">
+          <button class="btn" type="button" id="printBtn">Imprimir / Guardar PDF</button>
+          <button class="btn secondary" type="button" id="clearBtn">Limpiar formulario</button>
+        </div>
+      </form>
+    </aside>
+
+    <section class="preview-wrap">
+      <div class="print-root" id="printRoot"></div>
+    </section>
+  </main>
+
+  <script>
+    const LIMITS = {
+      a5: 4,
+      a4: 8,
+      "a4-two": 4
+    };
+
+    const form = document.getElementById("form");
+    const printRoot = document.getElementById("printRoot");
+    const medicineList = document.getElementById("medicineList");
+    const medicineSection = document.getElementById("medicineSection");
+    const smartguideSection = document.getElementById("smartguideSection");
+    const labSection = document.getElementById("labSection");
+    const documentType = document.getElementById("documentType");
+    const outputFormat = document.getElementById("outputFormat");
+    let labTwoUpAlertShown = false;
+
+    const fields = {
+      patient: document.getElementById("patient"),
+      idNumber: document.getElementById("idNumber"),
+      age: document.getElementById("age"),
+      date: document.getElementById("date"),
+      diagnosis: document.getElementById("diagnosis"),
+      nextVisit: document.getElementById("nextVisit"),
+      labTests: document.getElementById("labTests"),
+      labInstructions: document.getElementById("labInstructions")
+    };
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function line(value) {
+      return escapeHtml(String(value || "").trim()) || "&nbsp;";
+    }
+
+    function todayIso() {
+      const today = new Date();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      return `${today.getFullYear()}-${month}-${day}`;
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      const parts = value.split("-");
+      return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
+    }
+
+    // Lee todos los datos actuales del formulario en una estructura simple.
+    function readFormData() {
+      return {
+        type: documentType.value,
+        format: outputFormat.value,
+        patient: fields.patient.value,
+        idNumber: fields.idNumber.value,
+        age: fields.age.value,
+        date: formatDate(fields.date.value),
+        diagnosis: fields.diagnosis.value,
+        nextVisit: fields.nextVisit.value,
+        medicines: getMedicines(),
+        smartChecks: [...document.querySelectorAll("[data-smart-check]:checked")].map((item) => item.value),
+        labTests: splitLines(fields.labTests.value),
+        labInstructions: splitLines(fields.labInstructions.value)
+      };
+    }
+
+    function splitLines(value) {
+      return String(value || "")
+        .split(/\r?\n/)
+        .map((lineItem) => lineItem.trim())
+        .filter(Boolean);
+    }
+
+    function medValue(card, key) {
+      const input = card.querySelector(`[data-med="${key}"]`);
+      return input ? input.value : "";
+    }
+
+    function getMedicines() {
+      return [...medicineList.querySelectorAll(".medicine-card")].map((card) => ({
+        name: medValue(card, "name"),
+        quantity: medValue(card, "quantity"),
+        dose: medValue(card, "dose"),
+        route: medValue(card, "route"),
+        frequency: medValue(card, "frequency"),
+        duration: medValue(card, "duration"),
+        indications: medValue(card, "indications")
+      }));
+    }
+
+    function addMedicine(data = {}) {
+      const currentFormat = outputFormat.value;
+      if (currentFormat === "a4-two" && medicineList.children.length >= LIMITS["a4-two"]) {
+        alert("El modo A4 con 2 recetas A5 solo admite 4 medicamentos por receta. Use A5 individual o A4 individual para paginación automática.");
+        return;
+      }
+
+      const card = document.createElement("article");
+      card.className = "medicine-card";
+      const uid = `med_${Date.now()}_${medicineList.children.length}`;
+      card.innerHTML = `
+        <div class="medicine-card-head">
+          <span>Medicamento</span>
+          <button class="btn danger" type="button" data-remove>Eliminar medicamento</button>
+        </div>
+        <div class="control">
+          <label for="${uid}_name">Nombre del medicamento</label>
+          <input id="${uid}_name" type="text" data-med="name" autocomplete="off" value="${escapeHtml(data.name || "")}" placeholder="Escriba el nombre del medicamento" />
+        </div>
+        <div class="input-grid">
+          <div class="control">
+            <label>Cantidad</label>
+            <input type="text" data-med="quantity" autocomplete="off" value="${escapeHtml(data.quantity || "")}" />
+          </div>
+          <div class="control">
+            <label>Dosis</label>
+            <input type="text" data-med="dose" autocomplete="off" value="${escapeHtml(data.dose || "")}" />
+          </div>
+        </div>
+        <div class="input-grid">
+          <div class="control">
+            <label>Vía</label>
+            <input type="text" data-med="route" autocomplete="off" value="${escapeHtml(data.route || "")}" />
+          </div>
+          <div class="control">
+            <label>Frecuencia</label>
+            <input type="text" data-med="frequency" autocomplete="off" value="${escapeHtml(data.frequency || "")}" />
+          </div>
+        </div>
+        <div class="input-grid">
+          <div class="control">
+            <label>Duración</label>
+            <input type="text" data-med="duration" autocomplete="off" value="${escapeHtml(data.duration || "")}" />
+          </div>
+          <div class="control">
+            <label>Indicaciones</label>
+            <input type="text" data-med="indications" autocomplete="off" value="${escapeHtml(data.indications || "")}" />
+          </div>
+        </div>
+      `;
+
+      medicineList.appendChild(card);
+      card.querySelector("[data-remove]").addEventListener("click", () => {
+        card.remove();
+        renumberMedicines();
+        renderBySelectedFormat();
+      });
+      card.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("input", renderBySelectedFormat);
+        input.addEventListener("change", renderBySelectedFormat);
+        input.addEventListener("keyup", renderBySelectedFormat);
+      });
+      renumberMedicines();
+      renderBySelectedFormat();
+    }
+
+    function renumberMedicines() {
+      [...medicineList.querySelectorAll(".medicine-card-head span")].forEach((title, index) => {
+        title.textContent = `Medicamento ${index + 1}`;
+      });
+    }
+
+    // Divide medicamentos en páginas según el límite del formato.
+    function chunkMedicines(medicines, size) {
+      const chunks = [];
+      const source = medicines.length ? medicines : [];
+      for (let i = 0; i < source.length; i += size) {
+        chunks.push(source.slice(i, i + size));
+      }
+      return chunks.length ? chunks : [[]];
+    }
+
+    function headerHtml() {
+      return `
+        <header class="header">
+          <section class="brand">
+            <h1>Dr. David Guzmán P.</h1>
+            <div class="subtitle">Diabetes • Metabolismo • Obesidad • Tiroides</div>
+            <div class="microcopy">Plan terapéutico personalizado para control metabólico</div>
+          </section>
+          <section class="credentials">
+            <strong>Reg. Senescyt:</strong> 1006-2017-1855201<br />
+            <strong>Reg. MSP:</strong> 0920115086<br />
+            <strong>Contacto:</strong> 096 206 2122<br />
+            <strong>Email:</strong> davidguzman.med@gmail.com
+          </section>
+        </header>
+      `;
+    }
+
+    function patientHtml(data) {
+      return `
+        <section class="patient-box">
+          <div class="patient-grid">
+            <div class="label patient-label">Paciente:</div><div class="fill-line patient-value">${line(data.patient)}</div>
+            <div class="label id-label">Cédula:</div><div class="fill-line id-value">${line(data.idNumber)}</div>
+            <div class="label age-label">Edad:</div><div class="fill-line age-value">${line(data.age)}</div>
+            <div class="label date-label">Fecha:</div><div class="fill-line date-value">${line(data.date)}</div>
+          </div>
+          <div class="diagnosis-row"><div class="label">Diagnóstico:</div><div class="fill-line">${line(data.diagnosis)}</div></div>
+        </section>
+      `;
+    }
+
+    function footerHtml(data) {
+      return `
+        <footer class="next-footer">
+          <div class="footer-info">
+            <strong>Hospital de Especialidades de la Ciudad</strong> • Torre Sur, Consultorio 204<br />
+            Contacto: 096 206 2122 • davidguzman.med@gmail.com
+            <div class="motto">Pequeños cambios hoy, grandes resultados mañana.</div>
+          </div>
+          <div class="next-visit"><strong>Próxima cita</strong><div class="date-line">${line(data.nextVisit)}</div></div>
+          <div class="signature">
+            <img src="sello.png" alt="Firma y sello médico" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <div class="signature-line fallback"></div>
+            <small>Firma y sello médico</small>
+          </div>
+        </footer>
+      `;
+    }
+
+    function medicineSlot(med, number) {
+      const item = med || {};
+      return `
+        <article class="rx-item">
+          <div class="rx-horizontal">
+            <div class="rx-number">${number}</div>
+            <div class="rx-content">
+              <div class="rx-main-line">
+                <span class="rx-label">Medicamento:</span>
+                <div class="rx-line rx-med-name">${line(item.name)}</div>
+              </div>
+              <div class="rx-detail-line">
+                <div class="rx-value"><span class="rx-label">Cantidad:</span><div class="rx-line">${line(item.quantity)}</div></div>
+                <div class="rx-value"><span class="rx-label">Dosis:</span><div class="rx-line">${line(item.dose)}</div></div>
+                <div class="rx-value"><span class="rx-label">Vía:</span><div class="rx-line">${line(item.route)}</div></div>
+              </div>
+              <div class="rx-detail-line secondary">
+                <div class="rx-value"><span class="rx-label">Frecuencia:</span><div class="rx-line">${line(item.frequency)}</div></div>
+                <div class="rx-value"><span class="rx-label">Duración:</span><div class="rx-line">${line(item.duration)}</div></div>
+                <div></div>
+              </div>
+              <div class="rx-indications-line">
+                <span class="rx-label">Indicaciones:</span>
+                <div class="rx-line">${line(item.indications)}</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    // Renderiza receta médica para una página específica.
+    function renderMedicalRecipe(data, medicinesForPage, pageIndex, totalPages, firstMedicineNumber, slotsPerPage) {
+      const slots = Array.from({ length: slotsPerPage }, (_, index) => {
+        return medicineSlot(medicinesForPage[index], firstMedicineNumber + index);
+      }).join("");
+
+      return `
+        ${headerHtml()}
+        ${totalPages > 1 ? `<div class="page-count">Página ${pageIndex} de ${totalPages}</div>` : ""}
+        ${patientHtml(data)}
+        <div class="section-title">Rx / Prescripción</div>
+        <section class="rx-list">${slots}</section>
+        <section class="bottom-grid">
+          <div class="note-box">
+            <div class="note-title">Indicaciones metabólicas</div>
+            <ul>
+              <li>Hipoglucemia &lt;70 mg/dL: aplicar regla de 15 g.</li>
+              <li>Inyectables: rotar sitios de aplicación.</li>
+              <li>Insulinas: repuestos entre 2-8 °C. No congelar.</li>
+            </ul>
+          </div>
+          <div class="alert-box">
+            <div class="alert-title">Consultar de inmediato si presenta</div>
+            <ul>
+              <li>Glucosa persistentemente &gt;300 mg/dL.</li>
+              <li>Hipoglucemia severa o repetida.</li>
+              <li>Vómitos, deshidratación o dificultad respiratoria.</li>
+            </ul>
+          </div>
+        </section>
+        ${footerHtml(data)}
+      `;
+    }
+
+    // Renderiza solicitud SmartGuide con el mismo membrete y pie.
+    function renderSmartGuide(data, pageIndex = 1, totalPages = 1) {
+      const options = ["Diabetes mellitus", "Ajuste terapéutico", "Riesgo de hipoglucemia", "Variabilidad glucémica", "Control metabólico", "Otro"];
+      const checks = options.map((option) => `
+        <span class="check"><span class="box">${data.smartChecks.includes(option) ? "X" : ""}</span>${option}</span>
+      `).join("");
+
+      return `
+        ${headerHtml()}
+        <div class="page-count">Página ${pageIndex} de ${totalPages}</div>
+        ${patientHtml(data)}
+        <div class="section-title">Solicitud de equipo de monitoreo continuo de glucosa</div>
+        <section class="smartguide-box">
+          <div class="note-box">
+            <div class="note-title">Solicitud de equipo</div>
+            <p><strong>Se solicita equipo de monitoreo continuo de glucosa: SmartGuide.</strong></p>
+          </div>
+          <div class="note-box">
+            <div class="note-title">Descripción</div>
+            <p>Sistema de monitoreo continuo de glucosa indicado para evaluar el comportamiento glucémico durante el día y la noche, identificar tendencias, variabilidad glucémica, episodios de hipoglucemia/hiperglucemia y apoyar ajustes individualizados del plan terapéutico.</p>
+          </div>
+          <div class="note-box">
+            <div class="note-title">Indicaciones clínicas</div>
+            <div class="smartguide-check-preview">${checks}</div>
+          </div>
+          <div class="note-box">
+            <div class="note-title">Recomendaciones de uso</div>
+            <ul>
+              <li>Usar el sensor durante el periodo indicado para registrar patrones diarios.</li>
+              <li>Mantener alimentación, medicación y actividad habitual salvo indicación médica.</li>
+              <li>Anotar comidas, ejercicio, síntomas y episodios de hipoglucemia.</li>
+              <li>Acudir a control con el reporte generado para interpretación médica.</li>
+            </ul>
+          </div>
+          <div class="alert-box">
+            <div class="alert-title">Nota aclaratoria</div>
+            <p>El uso de SmartGuide se solicita con fines de diagnóstico funcional, seguimiento, control metabólico y apoyo al tratamiento. La interpretación de los datos debe realizarse dentro del contexto clínico del paciente y bajo criterio médico.</p>
+          </div>
+        </section>
+        ${footerHtml(data)}
+      `;
+    }
+
+    function labLineSlot(text, number) {
+      return `
+        <div class="lab-line">
+          <span class="lab-number">${number}.</span>
+          <div class="lab-text">${line(text)}</div>
+        </div>
+      `;
+    }
+
+    function labNoteHtml(data) {
+      const notes = data.labInstructions.length
+        ? data.labInstructions
+        : [
+            "Acudir en ayunas si el médico lo indicó.",
+            "Llevar resultados previos si dispone de ellos.",
+            "Informar si usa insulina, anticoagulantes u otros medicamentos relevantes."
+          ];
+
+      return `
+        <div class="note-box lab-note">
+          <div class="note-title">Indicaciones para el paciente</div>
+          <ul>${notes.map((note) => `<li>${line(note)}</li>`).join("")}</ul>
+        </div>
+      `;
+    }
+
+    // Renderiza solicitud de laboratorio para una página específica.
+    function renderLabRequest(data, testsForPage, pageIndex, totalPages, firstLineNumber, linesPerPage) {
+      const visibleLines = testsForPage.length ? testsForPage.length : Math.min(15, linesPerPage);
+      const slots = Array.from({ length: visibleLines }, (_, index) => {
+        return labLineSlot(testsForPage[index], firstLineNumber + index);
+      }).join("");
+
+      return `
+        ${headerHtml()}
+        ${totalPages > 1 ? `<div class="page-count">Página ${pageIndex} de ${totalPages}</div>` : ""}
+        ${patientHtml(data)}
+        <div class="section-title">Solicitud de laboratorio</div>
+        <section class="lab-request-box">
+          <div class="note-title">Exámenes solicitados</div>
+          ${slots}
+        </section>
+        ${labNoteHtml(data)}
+        ${footerHtml(data)}
+      `;
+    }
+
+    function pageHtml(formatClass, recipeHtml) {
+      return `<div class="${formatClass}"><section class="recipe"><div class="page-content">${recipeHtml}</div></section></div>`;
+    }
+
+    function twoUpPageHtml(recipeHtml) {
+      return `
+        <div class="page-a4-two">
+          <div class="cut-line"></div>
+          <div class="cut-label">línea de corte</div>
+          <section class="recipe top"><div class="page-content">${recipeHtml}</div></section>
+          <section class="recipe bottom"><div class="page-content">${recipeHtml}</div></section>
+        </div>
+      `;
+    }
+
+    // Renderiza según formato seleccionado y aplica las reglas de paginación.
+    function renderBySelectedFormat() {
+      try {
+        const data = readFormData();
+        const smartMode = data.type === "smartguide";
+        const labMode = data.type === "laboratorio";
+
+        medicineSection.hidden = smartMode || labMode;
+        smartguideSection.hidden = !smartMode;
+        labSection.hidden = !labMode;
+        document.body.className = `print-${data.format}`;
+        if (!labMode || data.format !== "a4-two") {
+          labTwoUpAlertShown = false;
+        }
+
+        if (smartMode) {
+          const recipe = renderSmartGuide(data);
+          printRoot.innerHTML = data.format === "a4-two"
+            ? twoUpPageHtml(recipe)
+            : pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
+          return;
+        }
+
+        if (labMode) {
+          if (data.format === "a4-two") {
+            if (data.labTests.length > 8 && !labTwoUpAlertShown) {
+              alert("El modo A4 con 2 solicitudes A5 solo admite 8 exámenes por copia. Use A5 individual o A4 individual para paginación automática.");
+              labTwoUpAlertShown = true;
+            } else if (data.labTests.length <= 8) {
+              labTwoUpAlertShown = false;
+            }
+            const recipe = renderLabRequest(data, data.labTests.slice(0, 8), 1, 1, 1, 8);
+            printRoot.innerHTML = twoUpPageHtml(recipe);
+            return;
+          }
+
+          const perPage = data.format === "a4" ? 20 : 15;
+          const pages = chunkMedicines(data.labTests, perPage);
+          printRoot.innerHTML = pages.map((tests, index) => {
+            const firstNumber = index * perPage + 1;
+            const recipe = renderLabRequest(data, tests, index + 1, pages.length, firstNumber, perPage);
+            return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
+          }).join("");
+          return;
+        }
+
+        if (data.format === "a4-two") {
+          const meds = data.medicines.slice(0, LIMITS["a4-two"]);
+          const recipe = renderMedicalRecipe(data, meds, 1, 1, 1, LIMITS["a4-two"]);
+          printRoot.innerHTML = twoUpPageHtml(recipe);
+          return;
+        }
+
+        const perPage = LIMITS[data.format];
+        const pages = chunkMedicines(data.medicines, perPage);
+        printRoot.innerHTML = pages.map((meds, index) => {
+          const firstNumber = index * perPage + 1;
+          const recipe = renderMedicalRecipe(data, meds, index + 1, pages.length, firstNumber, perPage);
+          return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
+        }).join("");
+      } catch (error) {
+        printRoot.innerHTML = `<div class="page-a5"><section class="recipe"><div class="alert-box"><div class="alert-title">Error de vista previa</div><p>${escapeHtml(error.message)}</p></div></section></div>`;
+        console.error(error);
+      }
+    }
+
+    function printDocument() {
+      renderBySelectedFormat();
+      window.print();
+    }
+
+    function clearForm() {
+      form.reset();
+      fields.date.value = todayIso();
+      medicineList.innerHTML = "";
+      addMedicine();
+      renderBySelectedFormat();
+    }
+
+    document.getElementById("addMedicine").addEventListener("click", () => addMedicine());
+    document.getElementById("clearBtn").addEventListener("click", clearForm);
+    document.getElementById("printBtn").addEventListener("click", printDocument);
+
+    form.querySelectorAll("input, select, textarea").forEach((input) => {
+      input.addEventListener("input", renderBySelectedFormat);
+      input.addEventListener("change", renderBySelectedFormat);
+      input.addEventListener("keyup", renderBySelectedFormat);
+    });
+
+    form.addEventListener("input", renderBySelectedFormat);
+    form.addEventListener("change", renderBySelectedFormat);
+    form.addEventListener("keyup", renderBySelectedFormat);
+
+    outputFormat.addEventListener("change", () => {
+      const data = readFormData();
+      if (data.format === "a4-two" && data.type === "receta" && data.medicines.length > LIMITS["a4-two"]) {
+        alert("El modo A4 con 2 recetas A5 solo admite 4 medicamentos por receta. Use A5 individual o A4 individual para paginación automática.");
+      }
+      renderBySelectedFormat();
+    });
+
+    fields.date.value = todayIso();
+    addMedicine();
+    renderBySelectedFormat();
+  </script>
+</body>
+</html>
