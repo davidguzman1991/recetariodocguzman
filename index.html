@@ -199,7 +199,8 @@
       accent-color: var(--teal-700);
     }
 
-    #labSection textarea {
+    #labSection textarea,
+    #imagingSection textarea {
       min-height: 118px;
     }
 
@@ -930,6 +931,14 @@
       padding-left: 3.6mm;
     }
 
+    .note-box p,
+    .alert-box p {
+      margin: 0;
+      color: #334155;
+      font-size: 6.3pt;
+      line-height: 1.22;
+    }
+
     .note-box li,
     .alert-box li {
       margin: 0.45mm 0;
@@ -1487,6 +1496,7 @@
               <option value="receta">Receta médica</option>
               <option value="smartguide">Solicitud SmartGuide</option>
               <option value="laboratorio">Solicitud de laboratorio</option>
+              <option value="imaging">Solicitud de imágenes</option>
             </select>
           </div>
           <div class="control">
@@ -1564,6 +1574,25 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
           </div>
         </section>
 
+        <section class="form-section" id="imagingSection" hidden>
+          <h2>Imágenes / estudios diagnósticos</h2>
+          <div class="control">
+            <label for="imagingStudies">Estudios solicitados</label>
+            <textarea id="imagingStudies" placeholder="Escriba aquí los estudios de imagen solicitados, uno por línea."></textarea>
+          </div>
+          <div class="control">
+            <label for="imagingReason">Motivo clínico / indicación</label>
+            <textarea id="imagingReason" placeholder="Ejemplo: Dolor abdominal en estudio."></textarea>
+          </div>
+          <div class="control">
+            <label for="imagingInstructions">Indicaciones para el paciente</label>
+            <textarea id="imagingInstructions">Acudir con orden médica e identificación.
+Llevar estudios previos si los tiene.
+Consultar preparación específica según el estudio.
+En caso de estudios contrastados, informar alergias o enfermedad renal.</textarea>
+          </div>
+        </section>
+
         <section class="print-warnings" id="printWarnings" hidden>
           <strong id="printWarningsTitle">Revisión antes de imprimir</strong>
           <div class="print-warnings-block" id="criticalBlock" hidden>
@@ -1621,6 +1650,7 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
     const medicineSection = document.getElementById("medicineSection");
     const smartguideSection = document.getElementById("smartguideSection");
     const labSection = document.getElementById("labSection");
+    const imagingSection = document.getElementById("imagingSection");
     const printWarnings = document.getElementById("printWarnings");
     const printWarningsTitle = document.getElementById("printWarningsTitle");
     const criticalBlock = document.getElementById("criticalBlock");
@@ -1662,7 +1692,10 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       diagnosis: document.getElementById("diagnosis"),
       nextVisit: document.getElementById("nextVisit"),
       labTests: document.getElementById("labTests"),
-      labInstructions: document.getElementById("labInstructions")
+      labInstructions: document.getElementById("labInstructions"),
+      imagingStudies: document.getElementById("imagingStudies"),
+      imagingReason: document.getElementById("imagingReason"),
+      imagingInstructions: document.getElementById("imagingInstructions")
     };
 
     function escapeHtml(value) {
@@ -1756,6 +1789,11 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         lab: {
           tests: [...(data.labTests || [])],
           instructions: [...(data.labInstructions || [])]
+        },
+        imaging: {
+          studies: [...(data.imagingStudies || [])],
+          reason: data.imagingReason || "",
+          instructions: [...(data.imagingInstructions || [])]
         },
         smartGuide: {
           checks: [...(data.smartChecks || [])]
@@ -1900,6 +1938,8 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       const patientLimit = isTwoUp ? 30 : isA5 ? 38 : 54;
       const nextVisitLimit = isTwoUp ? 14 : isA5 ? 18 : 24;
       const labLineLimit = isTwoUp ? 44 : isA5 ? 52 : 70;
+      const imagingLineLimit = isTwoUp ? 42 : isA5 ? 48 : 66;
+      const imagingReasonLimit = isTwoUp ? 90 : isA5 ? 130 : 190;
       const rxNameLimit = isTwoUp ? 26 : isA5 ? 34 : 44;
       const rxFieldLimit = isTwoUp ? 16 : isA5 ? 22 : 28;
       const rxIndicationsLimit = isTwoUp ? 28 : isA5 ? 38 : 56;
@@ -2040,6 +2080,50 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         }
       }
 
+      if (data.type === "imaging") {
+        if (!data.imagingStudies.length) {
+          critical.push("La solicitud de imágenes no tiene estudios solicitados.");
+        }
+
+        if (!diagnosis) {
+          recommendations.push("El diagnóstico está vacío; se recomienda registrar el contexto clínico.");
+        }
+
+        if (!String(data.imagingReason || "").trim()) {
+          warnings.push("El motivo clínico / indicación está vacío.");
+        }
+
+        if (!data.imagingInstructions.length) {
+          warnings.push("Las indicaciones para el paciente están vacías.");
+        }
+
+        data.imagingStudies.forEach((study, index) => {
+          if (String(study || "").trim().length > imagingLineLimit) {
+            warnings.push(`Estudio ${index + 1}: el texto es largo y puede verse comprimido en la línea de impresión.`);
+          }
+        });
+
+        if (String(data.imagingReason || "").trim().length > imagingReasonLimit) {
+          warnings.push("El motivo clínico es largo y podría afectar el diseño del documento.");
+        }
+
+        if (data.imagingInstructions.some((note) => String(note || "").trim().length > 72)) {
+          warnings.push("Las indicaciones para el paciente son largas y pueden verse muy compactas en formatos pequeños.");
+        }
+
+        if (format === "a4-two" && data.imagingStudies.length > 6) {
+          warnings.push("A4 con 2 solicitudes A5 solo admite 6 estudios por copia. Use A5 individual o A4 individual para no recortar información.");
+        }
+
+        if (format === "a5" && data.imagingStudies.length > 8) {
+          warnings.push("La solicitud A5 crea una nueva página después del estudio 8. Revise la numeración y el pie en todas las páginas.");
+        }
+
+        if (format === "a4" && data.imagingStudies.length > 14) {
+          warnings.push("La solicitud A4 crea una nueva página después del estudio 14. Verifique que el PDF incluya todas las páginas.");
+        }
+      }
+
       if (!critical.length && !warnings.length && !recommendations.length) {
         recommendations.push("Documento completo y listo para imprimir.");
       }
@@ -2065,7 +2149,10 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         medicines: getMedicines(),
         smartChecks: [...document.querySelectorAll("[data-smart-check]:checked")].map((item) => item.value),
         labTests: splitLines(fields.labTests.value),
-        labInstructions: splitLines(fields.labInstructions.value)
+        labInstructions: splitLines(fields.labInstructions.value),
+        imagingStudies: splitLines(fields.imagingStudies.value),
+        imagingReason: fields.imagingReason.value,
+        imagingInstructions: splitLines(fields.imagingInstructions.value)
       };
     }
 
@@ -2369,6 +2456,33 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
       `;
     }
 
+    function imagingReasonHtml(data) {
+      return `
+        <div class="note-box">
+          <div class="note-title">Motivo clínico / indicación</div>
+          <p>${line(data.imagingReason)}</p>
+        </div>
+      `;
+    }
+
+    function imagingInstructionsHtml(data) {
+      const notes = data.imagingInstructions.length
+        ? data.imagingInstructions
+        : [
+            "Acudir con orden médica e identificación.",
+            "Llevar estudios previos si los tiene.",
+            "Consultar preparación específica según el estudio.",
+            "En caso de estudios contrastados, informar alergias o enfermedad renal."
+          ];
+
+      return `
+        <div class="note-box lab-note">
+          <div class="note-title">Indicaciones para el paciente</div>
+          <ul>${notes.map((note) => `<li>${line(note)}</li>`).join("")}</ul>
+        </div>
+      `;
+    }
+
     // Renderiza solicitud de laboratorio para una página específica.
     function renderLabRequest(data, testsForPage, pageIndex, totalPages, firstLineNumber, linesPerPage) {
       const visibleLines = testsForPage.length ? testsForPage.length : Math.min(15, linesPerPage);
@@ -2386,6 +2500,27 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
           ${slots}
         </section>
         ${labNoteHtml(data)}
+        ${footerHtml(data)}
+      `;
+    }
+
+    function renderImagingRequest(data, studiesForPage, pageIndex, totalPages, firstLineNumber, linesPerPage) {
+      const visibleLines = studiesForPage.length ? studiesForPage.length : Math.min(linesPerPage, 8);
+      const slots = Array.from({ length: visibleLines }, (_, index) => {
+        return labLineSlot(studiesForPage[index], firstLineNumber + index);
+      }).join("");
+
+      return `
+        ${headerHtml()}
+        ${totalPages > 1 ? `<div class="page-count">Página ${pageIndex} de ${totalPages}</div>` : ""}
+        ${patientHtml(data)}
+        <div class="section-title">Solicitud de imágenes</div>
+        <section class="lab-request-box">
+          <div class="note-title">Estudios solicitados</div>
+          ${slots}
+        </section>
+        ${imagingReasonHtml(data)}
+        ${imagingInstructionsHtml(data)}
         ${footerHtml(data)}
       `;
     }
@@ -2408,10 +2543,12 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
     function buildPreviewHtml(data) {
       const smartMode = data.type === "smartguide";
       const labMode = data.type === "laboratorio";
+      const imagingMode = data.type === "imaging";
 
-      medicineSection.hidden = smartMode || labMode;
+      medicineSection.hidden = smartMode || labMode || imagingMode;
       smartguideSection.hidden = !smartMode;
       labSection.hidden = !labMode;
+      imagingSection.hidden = !imagingMode;
       setBodyViewClass(data.format);
       renderPrintWarnings(collectPrintWarnings(data));
 
@@ -2433,6 +2570,21 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         return pages.map((tests, index) => {
           const firstNumber = index * perPage + 1;
           const recipe = renderLabRequest(data, tests, index + 1, pages.length, firstNumber, perPage);
+          return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
+        }).join("");
+      }
+
+      if (imagingMode) {
+        if (data.format === "a4-two") {
+          const recipe = renderImagingRequest(data, data.imagingStudies.slice(0, 6), 1, 1, 1, 6);
+          return twoUpPageHtml(recipe);
+        }
+
+        const perPage = data.format === "a4" ? 14 : 8;
+        const pages = chunkMedicines(data.imagingStudies, perPage);
+        return pages.map((studies, index) => {
+          const firstNumber = index * perPage + 1;
+          const recipe = renderImagingRequest(data, studies, index + 1, pages.length, firstNumber, perPage);
           return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
         }).join("");
       }
@@ -2476,6 +2628,9 @@ Informar si usa insulina, anticoagulantes u otros medicamentos relevantes.</text
         fields.nextVisit.value = payload.patient?.nextVisit || "";
         fields.labTests.value = (payload.lab?.tests || []).join("\n");
         fields.labInstructions.value = (payload.lab?.instructions || []).join("\n");
+        fields.imagingStudies.value = (payload.imaging?.studies || []).join("\n");
+        fields.imagingReason.value = payload.imaging?.reason || "";
+        fields.imagingInstructions.value = (payload.imaging?.instructions || []).join("\n");
 
         document.querySelectorAll("[data-smart-check]").forEach((checkbox) => {
           checkbox.checked = (payload.smartGuide?.checks || []).includes(checkbox.value);
