@@ -200,7 +200,8 @@
     }
 
     #labSection textarea,
-    #imagingSection textarea {
+    #imagingSection textarea,
+    #certificateSection textarea {
       min-height: 118px;
     }
 
@@ -1070,6 +1071,65 @@
       font-size: 5.5pt;
     }
 
+    .certificate-box {
+      display: grid;
+      gap: 2.4mm;
+    }
+
+    .certificate-header {
+      display: flex;
+      justify-content: flex-end;
+      color: #334155;
+      font-size: 6.6pt;
+      font-weight: 700;
+    }
+
+    .certificate-title {
+      text-align: center;
+      color: #111827;
+      font-size: 8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .certificate-paragraph {
+      margin: 0;
+      color: #1f2937;
+      font-size: 6.5pt;
+      line-height: 1.45;
+      text-align: justify;
+    }
+
+    .certificate-grid {
+      display: grid;
+      gap: 1.2mm;
+    }
+
+    .certificate-line {
+      display: grid;
+      grid-template-columns: 34mm 1fr;
+      gap: 1.8mm;
+      align-items: end;
+    }
+
+    .certificate-line .label {
+      font-size: 6.6pt;
+      font-style: italic;
+      font-weight: 800;
+    }
+
+    .certificate-rest {
+      display: grid;
+      gap: 1mm;
+    }
+
+    .certificate-rest p {
+      margin: 0;
+      color: #111827;
+      font-size: 6.5pt;
+      line-height: 1.35;
+    }
+
     .check {
       display: inline-flex;
       align-items: center;
@@ -1497,6 +1557,7 @@
               <option value="smartguide">Solicitud SmartGuide</option>
               <option value="laboratorio">Solicitud de laboratorio</option>
               <option value="imaging">Solicitud de imágenes</option>
+              <option value="certificate">Certificado médico</option>
             </select>
           </div>
           <div class="control">
@@ -1593,6 +1654,68 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
           </div>
         </section>
 
+        <section class="form-section" id="certificateSection" hidden>
+          <h2>Certificado médico</h2>
+          <div class="input-grid">
+            <div class="control">
+              <label for="certificateAddress">Dirección domicilio</label>
+              <input id="certificateAddress" type="text" autocomplete="off" />
+            </div>
+            <div class="control">
+              <label for="certificatePhone">Número telefónico de contacto</label>
+              <input id="certificatePhone" type="text" autocomplete="off" />
+            </div>
+          </div>
+          <div class="input-grid">
+            <div class="control">
+              <label for="certificateCompany">Institución / Empresa</label>
+              <input id="certificateCompany" type="text" autocomplete="off" />
+            </div>
+            <div class="control">
+              <label for="certificateJob">Puesto de trabajo</label>
+              <input id="certificateJob" type="text" autocomplete="off" />
+            </div>
+          </div>
+          <div class="input-grid">
+            <div class="control">
+              <label for="certificateRestDays">Tiempo de reposo</label>
+              <select id="certificateRestDays">
+                <option value="1">1 día</option>
+                <option value="2">2 días</option>
+                <option value="3" selected>3 días</option>
+                <option value="4">4 días</option>
+                <option value="5">5 días</option>
+                <option value="7">7 días</option>
+                <option value="10">10 días</option>
+                <option value="14">14 días</option>
+                <option value="21">21 días</option>
+                <option value="30">30 días</option>
+              </select>
+            </div>
+            <div class="control">
+              <label for="certificateRestUnit">Unidad</label>
+              <select id="certificateRestUnit">
+                <option value="dias" selected>Días</option>
+                <option value="horas">Horas</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-grid">
+            <div class="control">
+              <label for="certificateRestStart">Desde</label>
+              <input id="certificateRestStart" type="date" />
+            </div>
+            <div class="control">
+              <label for="certificateRestEnd">Hasta</label>
+              <input id="certificateRestEnd" type="date" />
+            </div>
+          </div>
+          <div class="control">
+            <label for="certificateNotes">Observación clínica adicional</label>
+            <textarea id="certificateNotes" placeholder="Opcional."></textarea>
+          </div>
+        </section>
+
         <section class="print-warnings" id="printWarnings" hidden>
           <strong id="printWarningsTitle">Revisión antes de imprimir</strong>
           <div class="print-warnings-block" id="criticalBlock" hidden>
@@ -1651,6 +1774,7 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
     const smartguideSection = document.getElementById("smartguideSection");
     const labSection = document.getElementById("labSection");
     const imagingSection = document.getElementById("imagingSection");
+    const certificateSection = document.getElementById("certificateSection");
     const printWarnings = document.getElementById("printWarnings");
     const printWarningsTitle = document.getElementById("printWarningsTitle");
     const criticalBlock = document.getElementById("criticalBlock");
@@ -1695,7 +1819,16 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
       labInstructions: document.getElementById("labInstructions"),
       imagingStudies: document.getElementById("imagingStudies"),
       imagingReason: document.getElementById("imagingReason"),
-      imagingInstructions: document.getElementById("imagingInstructions")
+      imagingInstructions: document.getElementById("imagingInstructions"),
+      certificateAddress: document.getElementById("certificateAddress"),
+      certificatePhone: document.getElementById("certificatePhone"),
+      certificateCompany: document.getElementById("certificateCompany"),
+      certificateJob: document.getElementById("certificateJob"),
+      certificateRestDays: document.getElementById("certificateRestDays"),
+      certificateRestUnit: document.getElementById("certificateRestUnit"),
+      certificateRestStart: document.getElementById("certificateRestStart"),
+      certificateRestEnd: document.getElementById("certificateRestEnd"),
+      certificateNotes: document.getElementById("certificateNotes")
     };
 
     function escapeHtml(value) {
@@ -1746,6 +1879,56 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
       return parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : value;
     }
 
+    function formatDateLong(value) {
+      const iso = normalizeInputDate(value);
+      if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "";
+      const date = new Date(`${iso}T12:00:00`);
+      const weekdays = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
+      const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      const weekday = weekdays[date.getDay()];
+      return `${day}/${String(date.getMonth() + 1).padStart(2, "0")}/${year} ${weekday} ${day} (${day}) DE ${month} DE ${year}.`;
+    }
+
+    function restUnitLabel(value, count) {
+      const numeric = Number(count) || 0;
+      if (value === "horas") return numeric === 1 ? "hora" : "horas";
+      return numeric === 1 ? "día" : "días";
+    }
+
+    function computeEndDate(startDate, durationDays) {
+      const iso = normalizeInputDate(startDate);
+      if (!iso) return "";
+      const totalDays = Math.max(1, Number(durationDays) || 1);
+      const date = new Date(`${iso}T12:00:00`);
+      date.setDate(date.getDate() + totalDays - 1);
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${date.getFullYear()}-${month}-${day}`;
+    }
+
+    function syncCertificateRestEnd() {
+      if (!fields.certificateRestStart.value) return;
+      fields.certificateRestEnd.value = computeEndDate(fields.certificateRestStart.value, fields.certificateRestDays.value);
+    }
+
+    function initializeCertificateDefaults() {
+      if (!fields.certificateRestStart.value) {
+        fields.certificateRestStart.value = fields.date.value || todayForInput();
+      }
+      if (!fields.certificateRestDays.value) {
+        fields.certificateRestDays.value = "3";
+      }
+      if (!fields.certificateRestUnit.value) {
+        fields.certificateRestUnit.value = "dias";
+      }
+      if (!fields.certificateRestEnd.value) {
+        syncCertificateRestEnd();
+      }
+    }
+
     function syncDynamicPrintPageSize(format) {
       const printSize = format === "a5" ? "148mm 210mm" : "210mm 297mm";
       dynamicPrintStyle.textContent = `@media print { @page { size: ${printSize}; margin: 0; } }`;
@@ -1794,6 +1977,17 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
           studies: [...(data.imagingStudies || [])],
           reason: data.imagingReason || "",
           instructions: [...(data.imagingInstructions || [])]
+        },
+        certificate: {
+          address: data.certificateAddress || "",
+          phone: data.certificatePhone || "",
+          company: data.certificateCompany || "",
+          job: data.certificateJob || "",
+          restDays: data.certificateRestDays || "3",
+          restUnit: data.certificateRestUnit || "dias",
+          restStart: normalizeInputDate(data.certificateRestStart),
+          restEnd: normalizeInputDate(data.certificateRestEnd),
+          notes: data.certificateNotes || ""
         },
         smartGuide: {
           checks: [...(data.smartChecks || [])]
@@ -1940,6 +2134,7 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
       const labLineLimit = isTwoUp ? 44 : isA5 ? 52 : 70;
       const imagingLineLimit = isTwoUp ? 42 : isA5 ? 48 : 66;
       const imagingReasonLimit = isTwoUp ? 90 : isA5 ? 130 : 190;
+      const certificateNotesLimit = isTwoUp ? 90 : isA5 ? 130 : 180;
       const rxNameLimit = isTwoUp ? 26 : isA5 ? 34 : 44;
       const rxFieldLimit = isTwoUp ? 16 : isA5 ? 22 : 28;
       const rxIndicationsLimit = isTwoUp ? 28 : isA5 ? 38 : 56;
@@ -2124,6 +2319,40 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
         }
       }
 
+      if (data.type === "certificate") {
+        if (!String(data.certificateRestStart || "").trim()) {
+          critical.push("Falta la fecha de inicio del reposo médico.");
+        }
+
+        if (!String(data.certificateRestEnd || "").trim()) {
+          critical.push("Falta la fecha final del reposo médico.");
+        }
+
+        if (data.certificateRestStart && data.certificateRestEnd && normalizeInputDate(data.certificateRestEnd) < normalizeInputDate(data.certificateRestStart)) {
+          critical.push("La fecha final del reposo no puede ser anterior a la fecha inicial.");
+        }
+
+        if (!diagnosis) {
+          recommendations.push("El diagnóstico CIE-10 está vacío; se recomienda completarlo.");
+        }
+
+        if (!String(data.certificateAddress || "").trim()) {
+          recommendations.push("La dirección del paciente está vacía.");
+        }
+
+        if (!String(data.certificatePhone || "").trim()) {
+          recommendations.push("El número telefónico de contacto está vacío.");
+        }
+
+        if ((Number(data.certificateRestDays) || 0) > 14) {
+          warnings.push("El tiempo de reposo es prolongado. Revise que las fechas sean correctas.");
+        }
+
+        if (String(data.certificateNotes || "").trim().length > certificateNotesLimit) {
+          warnings.push("La observación clínica adicional es larga y podría afectar el diseño del certificado.");
+        }
+      }
+
       if (!critical.length && !warnings.length && !recommendations.length) {
         recommendations.push("Documento completo y listo para imprimir.");
       }
@@ -2152,7 +2381,16 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
         labInstructions: splitLines(fields.labInstructions.value),
         imagingStudies: splitLines(fields.imagingStudies.value),
         imagingReason: fields.imagingReason.value,
-        imagingInstructions: splitLines(fields.imagingInstructions.value)
+        imagingInstructions: splitLines(fields.imagingInstructions.value),
+        certificateAddress: fields.certificateAddress.value,
+        certificatePhone: fields.certificatePhone.value,
+        certificateCompany: fields.certificateCompany.value,
+        certificateJob: fields.certificateJob.value,
+        certificateRestDays: fields.certificateRestDays.value,
+        certificateRestUnit: fields.certificateRestUnit.value,
+        certificateRestStart: fields.certificateRestStart.value,
+        certificateRestEnd: fields.certificateRestEnd.value,
+        certificateNotes: fields.certificateNotes.value
       };
     }
 
@@ -2525,6 +2763,64 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
       `;
     }
 
+    function renderMedicalCertificate(data, pageIndex = 1, totalPages = 1) {
+      const patientId = line(data.idNumber);
+      const durationValue = Number(data.certificateRestDays) || 0;
+      const unitLabel = restUnitLabel(data.certificateRestUnit, durationValue);
+      const fromLong = formatDateLong(data.certificateRestStart);
+      const toLong = formatDateLong(data.certificateRestEnd);
+
+      return `
+        ${headerHtml()}
+        ${totalPages > 1 ? `<div class="page-count">Página ${pageIndex} de ${totalPages}</div>` : ""}
+        <section class="certificate-box">
+          <div class="certificate-header">${line(data.date)}</div>
+          <div class="certificate-title">Certificado médico</div>
+          <p class="certificate-paragraph">
+            Por la presente, certifico que el paciente <strong>${line(data.patient)}</strong>,
+            identificado con la cédula de ciudadanía <strong>${patientId}</strong>,
+            es atendido en la presente unidad de salud.
+          </p>
+          <div class="certificate-grid">
+            <div class="certificate-line">
+              <div class="label">Diagnóstico CIE-10:</div>
+              <div class="fill-line diagnosis-value">${line(data.diagnosis)}</div>
+            </div>
+            <div class="certificate-line">
+              <div class="label">Dirección domicilio:</div>
+              <div class="fill-line">${line(data.certificateAddress)}</div>
+            </div>
+            <div class="certificate-line">
+              <div class="label">Número telefónico de contacto:</div>
+              <div class="fill-line">${line(data.certificatePhone)}</div>
+            </div>
+            <div class="certificate-line">
+              <div class="label">Institución / Empresa:</div>
+              <div class="fill-line">${line(data.certificateCompany)}</div>
+            </div>
+            <div class="certificate-line">
+              <div class="label">Puesto de trabajo:</div>
+              <div class="fill-line">${line(data.certificateJob)}</div>
+            </div>
+            <div class="certificate-line">
+              <div class="label">Número de documento:</div>
+              <div class="fill-line">${patientId}</div>
+            </div>
+          </div>
+          <div class="note-box certificate-rest">
+            <div class="note-title">Reposo médico</div>
+            <p>Se requiere reposo médico en domicilio por <strong>${line(durationValue || "")} ${unitLabel}</strong>.</p>
+            <p><strong>Desde:</strong> ${line(fromLong)}</p>
+            <p><strong>Hasta:</strong> ${line(toLong)}</p>
+          </div>
+          ${String(data.certificateNotes || "").trim()
+            ? `<div class="note-box"><div class="note-title">Observación clínica</div><p>${line(data.certificateNotes)}</p></div>`
+            : ""}
+        </section>
+        ${footerHtml(data)}
+      `;
+    }
+
     function pageHtml(formatClass, recipeHtml) {
       return `<div class="${formatClass}"><section class="recipe"><div class="page-content">${recipeHtml}</div></section></div>`;
     }
@@ -2544,11 +2840,13 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
       const smartMode = data.type === "smartguide";
       const labMode = data.type === "laboratorio";
       const imagingMode = data.type === "imaging";
+      const certificateMode = data.type === "certificate";
 
-      medicineSection.hidden = smartMode || labMode || imagingMode;
+      medicineSection.hidden = smartMode || labMode || imagingMode || certificateMode;
       smartguideSection.hidden = !smartMode;
       labSection.hidden = !labMode;
       imagingSection.hidden = !imagingMode;
+      certificateSection.hidden = !certificateMode;
       setBodyViewClass(data.format);
       renderPrintWarnings(collectPrintWarnings(data));
 
@@ -2587,6 +2885,13 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
           const recipe = renderImagingRequest(data, studies, index + 1, pages.length, firstNumber, perPage);
           return pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
         }).join("");
+      }
+
+      if (certificateMode) {
+        const recipe = renderMedicalCertificate(data);
+        return data.format === "a4-two"
+          ? twoUpPageHtml(recipe)
+          : pageHtml(data.format === "a4" ? "page-a4" : "page-a5", recipe);
       }
 
       if (data.format === "a4-two") {
@@ -2631,6 +2936,15 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
         fields.imagingStudies.value = (payload.imaging?.studies || []).join("\n");
         fields.imagingReason.value = payload.imaging?.reason || "";
         fields.imagingInstructions.value = (payload.imaging?.instructions || []).join("\n");
+        fields.certificateAddress.value = payload.certificate?.address || "";
+        fields.certificatePhone.value = payload.certificate?.phone || "";
+        fields.certificateCompany.value = payload.certificate?.company || "";
+        fields.certificateJob.value = payload.certificate?.job || "";
+        fields.certificateRestDays.value = payload.certificate?.restDays || "3";
+        fields.certificateRestUnit.value = payload.certificate?.restUnit || "dias";
+        fields.certificateRestStart.value = payload.certificate?.restStart || fields.date.value || todayForInput();
+        fields.certificateRestEnd.value = payload.certificate?.restEnd || computeEndDate(fields.certificateRestStart.value, fields.certificateRestDays.value);
+        fields.certificateNotes.value = payload.certificate?.notes || "";
 
         document.querySelectorAll("[data-smart-check]").forEach((checkbox) => {
           checkbox.checked = (payload.smartGuide?.checks || []).includes(checkbox.value);
@@ -2732,6 +3046,10 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
     function clearForm() {
       form.reset();
       fields.date.value = todayForInput();
+      fields.certificateRestStart.value = fields.date.value;
+      fields.certificateRestDays.value = "3";
+      fields.certificateRestUnit.value = "dias";
+      fields.certificateRestEnd.value = computeEndDate(fields.certificateRestStart.value, fields.certificateRestDays.value);
       resetMedicineList();
       flushRender();
       scheduleAutosave();
@@ -2763,6 +3081,10 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
       deleteDraftStorage();
       form.reset();
       fields.date.value = todayForInput();
+      fields.certificateRestStart.value = fields.date.value;
+      fields.certificateRestDays.value = "3";
+      fields.certificateRestUnit.value = "dias";
+      fields.certificateRestEnd.value = computeEndDate(fields.certificateRestStart.value, fields.certificateRestDays.value);
       resetMedicineList();
       renderPrintWarnings({ critical: [], warnings: [], recommendations: ["Documento nuevo listo para completar."] });
       flushRender();
@@ -2787,6 +3109,25 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
       scheduleAutosave();
     });
 
+    fields.certificateRestDays.addEventListener("change", () => {
+      syncCertificateRestEnd();
+      scheduleRender(2);
+      scheduleAutosave();
+    });
+
+    fields.certificateRestStart.addEventListener("change", () => {
+      syncCertificateRestEnd();
+      scheduleRender(2);
+      scheduleAutosave();
+    });
+
+    fields.date.addEventListener("change", () => {
+      if (!fields.certificateRestStart.value) {
+        fields.certificateRestStart.value = fields.date.value;
+        syncCertificateRestEnd();
+      }
+    });
+
     mobileViewToggle.addEventListener("click", (event) => {
       const button = event.target.closest("[data-mobile-view]");
       if (!button) return;
@@ -2805,6 +3146,7 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
     }
 
     fields.date.value = todayForInput();
+    initializeCertificateDefaults();
     setMobileView("editor");
     isRestoringDraft = true;
     resetMedicineList();
