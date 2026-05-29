@@ -1105,6 +1105,27 @@
       gap: 1.2mm;
     }
 
+    .certificate-diagnosis {
+      display: grid;
+      gap: 1mm;
+    }
+
+    .certificate-diagnosis .label {
+      font-size: 6.6pt;
+      font-style: italic;
+      font-weight: 800;
+    }
+
+    .certificate-diagnosis-box {
+      min-height: 16mm;
+      padding-top: 0.8mm;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
     .certificate-line {
       display: grid;
       grid-template-columns: 34mm 1fr;
@@ -2781,11 +2802,11 @@ En caso de estudios contrastados, informar alergias o enfermedad renal.</textare
             identificado con la cédula de ciudadanía <strong>${patientId}</strong>,
             es atendido en la presente unidad de salud.
           </p>
+          <div class="certificate-diagnosis">
+            <div class="label">Diagnóstico CIE-10:</div>
+            <div class="fill-line diagnosis-value certificate-diagnosis-box">${line(data.diagnosis)}</div>
+          </div>
           <div class="certificate-grid">
-            <div class="certificate-line">
-              <div class="label">Diagnóstico CIE-10:</div>
-              <div class="fill-line diagnosis-value">${line(data.diagnosis)}</div>
-            </div>
             <div class="certificate-line">
               <div class="label">Dirección domicilio:</div>
               <div class="fill-line">${line(data.certificateAddress)}</div>
